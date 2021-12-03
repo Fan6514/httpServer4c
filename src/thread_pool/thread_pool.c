@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-#include "../include/util.h"
+#include "util.h"
 #include "thread_pool.h"
 
 ThreadPool * threadPoolCreate(int taskCapacity, int poolSize, int poolMinSize)
@@ -30,22 +30,22 @@ ThreadPool * threadPoolCreate(int taskCapacity, int poolSize, int poolMinSize)
 
     /* 初始化锁 */
     ret = pthread_mutex_init(&pThreadPool->mutexPool, NULL);
-    CHECK_RETURN(ret, SUCCESS, "pthread_mutex_init error.\n");
+    CHECK_RETURN(ret, SUCCESS, "pthread_mutex_init error.");
     /* 初始化条件变量 */
     ret = pthread_cond_init(&pThreadPool->condPool, NULL);
-    CHECK_RETURN(ret, SUCCESS, "pthread_cond_init error.\n");
+    CHECK_RETURN(ret, SUCCESS, "pthread_cond_init error.");
     ret = pthread_cond_init(&pThreadPool->notEmpty, NULL);
-    CHECK_RETURN(ret, SUCCESS, "pthread_cond_init error.\n");
+    CHECK_RETURN(ret, SUCCESS, "pthread_cond_init error.");
     ret = pthread_cond_init(&pThreadPool->notFull, NULL);
-    CHECK_RETURN(ret, SUCCESS, "pthread_cond_init error.\n");
+    CHECK_RETURN(ret, SUCCESS, "pthread_cond_init error.");
 
     /* 创建线程 */
     ret = pthread_create(&pThreadPool->managerID, NULL, manager, pThreadPool);
-    CHECK_RETURN(ret, SUCCESS, "pthread_create error.\n");
+    CHECK_RETURN(ret, SUCCESS, "pthread_create error.");
     for (int i = 0; i < poolMinSize; i++)
     {
         ret = pthread_create(&pThreadPool->workIDs[i], NULL, work, pThreadPool);
-        CHECK_RETURN(ret, SUCCESS, "pthread_create error.\n");
+        CHECK_RETURN(ret, SUCCESS, "pthread_create error.");
     }
 
     return pThreadPool;
@@ -241,7 +241,7 @@ void addThread(ThreadPool *pThreadPool)
         if (pThreadPool->workIDs[i] == 0)
         {
             ret = pthread_create(&pThreadPool->workIDs[i], NULL, work, pThreadPool);
-            CHECK_RETURN(ret, SUCCESS, "pthread_create error.\n");
+            CHECK_RETURN(ret, SUCCESS, "pthread_create error.");
             count++;
             pThreadPool->liveNum++;
         }

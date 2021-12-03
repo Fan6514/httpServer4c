@@ -1,5 +1,7 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
+
+#include "logger.h"
 /*--------------------------------------------------*/
 /* 宏定义
 */
@@ -27,7 +29,7 @@ do\
     ptr = (type*)malloc(size);\
     if (NULL == ptr)\
     {\
-        printf("Malloc error.\n");\
+        LOG_ERROR("Malloc error.");\
         goto pos;\
     }\
     memset(ptr, 0, size);\
@@ -39,7 +41,7 @@ do\
     ptr = (type*)malloc(size);\
     if (NULL == ptr)\
     {\
-        printf("Malloc error.\n");\
+        LOG_ERROR("Malloc error.");\
         return MEM_ERROR;\
     }\
     memset(ptr, 0, size);\
@@ -50,7 +52,7 @@ do\
 {\
     if (sucess != ret)\
     {\
-        printf(str);\
+        LOG_ERROR(str);\
         ret = RTN_ERROR;\
     }\
 }while(0)
@@ -60,17 +62,17 @@ do\
 {\
     if (error == ret)\
     {\
-        printf(str);\
+        LOG_ERROR(str);\
         ret = RTN_ERROR;\
     }\
 }while(0)
 
-#define CHECK_RETURN_GOTO(ret, sucess, str, pos)\
+#define CHECK_RETURN_GOTO(ret, sucess, pos, str, args...)\
 do\
 {\
     if (sucess != ret)\
     {\
-        printf(str);\
+        LOG_ERROR(str, ##args);\
         goto pos;\
     }\
 }while(0)

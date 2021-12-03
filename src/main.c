@@ -3,8 +3,8 @@
 
 #include "epoll.h"
 #include "socket.h"
-#include "../thread_pool/thread_pool.h"
-#include "../include/util.h"
+#include "thread_pool.h"
+#include "util.h"
 
 int main()
 {

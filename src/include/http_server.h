@@ -5,6 +5,9 @@
 /* 宏定义
 */
 /*--------------------------------------------------*/
+#define MAX_IPADDR_LEN      15
+#define MAX_BUf_LEN         2048
+#define MAX_HTTP_HEAD_LEN   1024
 
 /*--------------------------------------------------*/
 /* 数据结构 
@@ -15,7 +18,7 @@ typedef enum { HTTP_10 = 0, HTTP_11, VERSION_NOT_SUPPORT}HTTP_VERSION;
 typedef enum { KEEP_ALIVE = 0, HTTP_11, VERSION_NOT_SUPPORT}HTTP_CONNECTION;
 typedef struct 
 {
-    int ip;
+    char *ip;
     int port;
 }HOST_ADDR;
 

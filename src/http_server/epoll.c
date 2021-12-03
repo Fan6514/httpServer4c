@@ -4,7 +4,7 @@
 #include <sys/epoll.h>
 
 #include "epoll.h"
-#include "../include/util.h"
+#include "util.h"
 
 struct epoll_event *events;
 
@@ -13,7 +13,7 @@ int epollInit()
     int epoll_fd = 0;
 
     epoll_fd = epoll_create(MAX_EVENT);
-    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_create error.\n");
+    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_create error.");
 
     GET_MEMORY_RTN(events, struct epoll_event, sizeof(struct epoll_event)*MAX_EVENT);
 
@@ -30,7 +30,7 @@ int epollEventAdd(int epoll_fd, int fd)
 
     /* 将 fd 绑定到 epoll_fd */
     ret = epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);
-    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_ctl error.\n");
+    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_ctl error.");
 
     return ret;
 }
@@ -45,7 +45,7 @@ int epollEventMod(int epoll_fd, int fd, __uint32_t events)
 
     /* 修改 epoll_fd 中绑定的 fd 的事件为events */
     ret = epoll_ctl(epoll_fd, EPOLL_CTL_MOD, fd, &event);
-    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_ctl error.\n");
+    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_ctl error.");
 
     return ret;
 }
@@ -60,7 +60,7 @@ int epollEventDel(int epoll_fd, int fd, __uint32_t events)
 
     /* 删除 epoll_fd 中绑定的 fd */
     ret = epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, &event);
-    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_ctl error.\n");
+    CHECK_RETURN_ERR(epoll_fd, -1, "epoll_ctl error.");
 
     return ret;
 }
@@ -73,7 +73,7 @@ int epollWait(int epoll_fd, int *eventSum, struct epoll_event *epoll_events)
     CHECK_POINT(epoll_events);
 
     *eventSum = epoll_wait(epoll_fd, epoll_events, MAX_EVENT, TIME_OUT);
-    CHECK_RETURN_ERR(*eventSum, -1, "epoll_wait error.\n");
+    CHECK_RETURN_ERR(*eventSum, -1, "epoll_wait error.");
     ret = *eventSum == -1 ? RTN_ERROR : SUCCESS;
 
     return ret;

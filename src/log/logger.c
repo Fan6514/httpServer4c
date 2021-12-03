@@ -7,7 +7,7 @@ void loggerInit(const char* categoryName)
 {
     if(log4c_init() != 0)
     {
-        printf("log4c init error.\n");
+        printf("log4c init error.");
         return;
     }
 
@@ -18,6 +18,6 @@ void loggerUninit()
 {
     if(log4c_fini() != 0)
     {
-        printf("log4c uninit error.\n");
+        printf("log4c uninit error.");
     }
 }

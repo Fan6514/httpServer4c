@@ -6,7 +6,7 @@
 void taskFunc(void* arg)
 {
     int num = *(int*)arg;
-    printf("thread %ld is working, number = %d\n",
+    printf("thread %ld is working, number = %d",
         pthread_self(), num);
     sleep(10);
 }
