@@ -32,6 +32,7 @@ int socketBind(SERVER_SOCKET* http_socket);
 int socketListen(SERVER_SOCKET* http_socket);
 int socketAccept(SERVER_SOCKET* http_socket);
 int socketUninit(SERVER_SOCKET* http_socket);
-int socketRecv(SERVER_SOCKET* http_socket);
+int socketRecv(SERVER_SOCKET* http_socket, char* buf);
+int socketRecv(SERVER_SOCKET* http_socket, char* buf);
 
 #endif

@@ -65,7 +65,7 @@ void httpServerRequest(void *arg)
     SERVER_SOCKET *server_socket = NULL;
     HTTP_REQUEST_DATA http_data;
 
-    CHECK_POINT(arg);
+    CHECK_POINT_NORTN(arg);
     
     server_socket = (SERVER_SOCKET *)arg;
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
@@ -78,9 +78,9 @@ void httpServerRequest(void *arg)
     switch(http_data.header.method)
     {
         case GET:
-            do_requestForGet();
+            //do_requestForGet();
         case POST:
-            do_requestForPost();
+            //do_requestForPost();
     }
 
 finish:
@@ -147,7 +147,7 @@ int httpServerRun(int port, int pollSize, int pollCoreSize)
             ret = socketAccept(&server_socket);
             CHECK_RETURN(ret, SUCCESS, "socketAccept error.");
             LOG_INFO("[socket]connect:%d port:%u client addr:%s", server_socket.conn_fd, server_socket.port,
-                                                     inet_ntoa(server_socket.clientAddr));
+                                                     inet_ntoa(server_socket.clientAddr.sin_addr));
 
             ret = threadPoolAddTask(thread_pool, httpServerRequest, (void*)&server_socket);
             CHECK_RETURN(ret, SUCCESS, "threadPoolAddTask error.");
