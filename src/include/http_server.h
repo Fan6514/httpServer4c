@@ -1,6 +1,8 @@
 #ifndef _HTTP_SERVER_H_
 #define _HTTP_SERVER_H_
 
+#include "util.h"
+
 /*--------------------------------------------------*/
 /* 宏定义
 */
@@ -14,8 +16,8 @@
 */
 /*--------------------------------------------------*/
 typedef enum { GET = 0, POST, PUT, DELETE, METHOD_NOT_SUPPORT }HTTP_METHOD;
-typedef enum { HTTP_10 = 0, HTTP_11, VERSION_NOT_SUPPORT}HTTP_VERSION;
-typedef enum { KEEP_ALIVE = 0, HTTP_11, VERSION_NOT_SUPPORT}HTTP_CONNECTION;
+typedef enum { HTTP_10 = 0, HTTP_11, VERSION_NOT_SUPPORT }HTTP_VERSION;
+typedef enum { KEEP_ALIVE = 0 }HTTP_CONNECTION;
 typedef struct 
 {
     char *ip;

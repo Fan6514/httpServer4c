@@ -1,6 +1,7 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include <stdlib.h>
 #include "logger.h"
 /*--------------------------------------------------*/
 /* 宏定义
@@ -67,12 +68,12 @@ do\
     }\
 }while(0)
 
-#define CHECK_RETURN_GOTO(ret, sucess, pos, str, args...)\
+#define CHECK_RETURN_GOTO(ret, sucess, pos, str)\
 do\
 {\
     if (sucess != ret)\
     {\
-        LOG_ERROR(str, ##args);\
+        LOG_ERROR(str);\
         goto pos;\
     }\
 }while(0)

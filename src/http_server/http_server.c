@@ -71,9 +71,9 @@ void httpServerRequest(void *arg)
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
 
     ret = socketRecv(server_socket, buf);
-    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket:%d recv msg error.", server_socket.conn_fd);
+    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket recv msg error.");
     ret = parseHttpData(buf, &http_data);
-    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket:%d parse http data error.", server_socket.conn_fd);
+    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error.");
 
     switch(http_data.header.method)
     {
@@ -130,7 +130,7 @@ int httpServerRun(int port, int pollSize, int pollCoreSize)
 
     /* 服务器初始化 */
     ret = httpServerStartUp(port, pollSize, pollCoreSize, &thread_pool, &epoll_fd, &server_socket);
-    CHECK_RETURN_GOTO(ret, SUCCESS, "httpServerStartUp error.", error);
+    CHECK_RETURN_GOTO(ret, SUCCESS, error, "httpServerStartUp error.");
 
     while(true)
     {
