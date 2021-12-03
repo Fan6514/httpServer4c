@@ -4,8 +4,11 @@ INCLUDE = -I /usr/log4c/include ./include
 
 ALL: serv
 
-serv: serv.o socket.o thread.o
+serv: main.o http_server.o socket.o epoll.o logger.o thread_pool.o
     gcc -o serv ${CFLAGS} ${LIB} ${INCLUDE} http_server.o socket.o epoll.o logger.o thread_pool.o
+
+main.o: main.c
+    gcc -c main.c
 
 http_server.o: http_server/http_server.c
     gcc -c http_server/http_server.c
@@ -21,6 +24,8 @@ logger.o: log/logger.c
 
 thread_pool.o: thread_pool/thread_pool.c
     gcc -c thread_pool/thread_pool.c
+
+
 
 clean:
     rm -rf serv *.o
