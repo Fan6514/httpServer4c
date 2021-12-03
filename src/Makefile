@@ -1,7 +1,7 @@
 CFLAGS = -Wall -lpthread -llog4c
 LIB = -L /usr/local/log4c/lib
 INCLUDE = -I ./include -I /usr/log4c/include
-STD = -std=c99
+STD = -std=gnu99
 
 ALL: serv
 
@@ -25,8 +25,6 @@ logger.o: log/logger.c
 
 thread_pool.o: thread_pool/thread_pool.c
 	gcc -c ${INCLUDE} ${STD} thread_pool/thread_pool.c
-
-
 
 clean:
 	rm -rf serv *.o

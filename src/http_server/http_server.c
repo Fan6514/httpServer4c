@@ -81,6 +81,8 @@ void httpServerRequest(void *arg)
             //do_requestForGet();
         case POST:
             //do_requestForPost();
+        default:
+            break;
     }
 
 finish:
