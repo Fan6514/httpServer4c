@@ -219,7 +219,7 @@ void *manager(void *arg)
             case REALLOCATION:
                 addThread(pThreadPool);
                 break;
-            case DELETE:
+            case STOP:
                 delThread(pThreadPool);
                 break;
             default:
