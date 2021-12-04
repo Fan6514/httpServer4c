@@ -15,6 +15,8 @@ typedef enum { false, true } __attribute__ ((packed)) boolean;
 #define RTN_ERROR       2
 #define MEM_ERROR       3
 
+#define MAX_BUf_LEN         2048
+
 #define REL_MEMORY(ptr)\
 do\
 {\
