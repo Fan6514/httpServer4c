@@ -105,7 +105,7 @@ int socketRecv(SERVER_SOCKET* http_socket, char* buf)
     return ret;
 }
 
-int socketRecv(SERVER_SOCKET* http_socket, char* buf)
+int socketSend(SERVER_SOCKET* http_socket, char* buf)
 {
     int ret = SUCCESS;
 
