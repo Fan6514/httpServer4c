@@ -1,12 +1,12 @@
 CFLAGS = -Wall -lpthread -llog4c
-LIB = -L /usr/local/log4c/lib
+LIB = -L /usr/log4c/lib
 INCLUDE = -I ./include -I /usr/log4c/include
 STD = -std=gnu99
 
 ALL: serv
 
 serv: main.o http_server.o socket.o epoll.o logger.o thread_pool.o
-	gcc -o serv ${CFLAGS} ${LIB} ${STD} http_server.o socket.o epoll.o logger.o thread_pool.o
+	gcc -o serv ${CFLAGS} ${LIB} ${STD} main.o http_server.o socket.o epoll.o logger.o thread_pool.o
 
 main.o: main.c
 	gcc -c ${INCLUDE} ${STD} main.c

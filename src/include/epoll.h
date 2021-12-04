@@ -9,7 +9,7 @@
 /*--------------------------------------------------*/
 #define MAX_EVENT 1024
 #define TIME_OUT 1000
-#define DEFAULT_EPOLL_EVENTS (EPOLLIN | EPOLLET | EPOLLONESHOT)
+#define DEFAULT_EPOLL_EVENTS (EPOLLIN | EPOLLET)
 
 /*--------------------------------------------------*/
 /* EPOLL 函数
