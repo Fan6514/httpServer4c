@@ -287,7 +287,7 @@ THREAD_STATE getCurrentState(ThreadPool *pThreadPool)
     /* 销毁线程 - 忙的线程*2 < 存活的线程数 && 存活的线程 > 最小线程数 */
     else if (busyNum*2 < liveNum && liveNum > pThreadPool->minNum)
     {
-        state = DELETE;
+        state = STOP;
     }
 
     return state;
