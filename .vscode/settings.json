@@ -2,6 +2,7 @@
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
         "epoll.h": "c",
-        "util.h": "c"
+        "util.h": "c",
+        "http_parse.h": "c"
     }
 }

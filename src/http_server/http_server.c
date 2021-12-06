@@ -7,56 +7,10 @@
 #include "socket.h"
 #include "thread_pool.h"
 #include "http_server.h"
+#include "http_parse.h"
 #include "util.h"
 
 extern struct epoll_event *events;
-
-int parseHttpRequestHead(char *head_buf, HTTP_REQUEST_DATA *http_data)
-{
-    int ret = SUCCESS;
-
-    CHECK_POINT(head_buf);
-    CHECK_POINT(http_data);
-
-    
-}
-
-int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
-{
-    int nPos = 0;
-    int ret = SUCCESS;
-    char *head_buf = NULL;
-    char *temp_buf = NULL;
-
-    CHECK_POINT(buf);
-    CHECK_POINT(http_data);
-
-    memset(http_data, 0, sizeof(HTTP_REQUEST_DATA));
-    GET_MEMORY(head_buf, char, MAX_HTTP_HEAD_LEN, finish);
-
-    /* 获取报文头 */
-    temp_buf = buf;
-    while (*temp_buf != '\0')
-    {
-        if (temp_buf == strstr(temp_buf, "\r\n\r\n"))
-        {
-            break;
-        }
-        nPos++;
-        temp_buf++;
-    }
-    strncpy(head_buf, buf, nPos);
-    LOG_DEBUG("[httpServer] head_buf:%s", head_buf);
-
-    ret = parseHttpRequestHead(head_buf, http_data);
-    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] parseHttpRequestHead error.");
-    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", http_data->header.method, http_data->header.version, 
-                                                            http_data->header.url);
-
-finish:
-    REL_MEMORY(head_buf);
-    return ret;
-}
 
 void httpServerRequest(void *arg)
 {
@@ -146,16 +100,13 @@ int httpServerRun(int port, int pollSize, int pollCoreSize)
         
         for (int i = 0; i < eventSum; ++i)
         {
-            if (events[i].data.fd == server_socket.listen_fd)
-            {
-                ret = socketAccept(&server_socket);
-                CHECK_RETURN(ret, SUCCESS, "socketAccept error.");
-                LOG_INFO("[socket]connect:%d port:%u client addr:%s", server_socket.conn_fd, server_socket.port,
-                                                        inet_ntoa(server_socket.clientAddr.sin_addr));
+            ret = socketAccept(&server_socket);
+            CHECK_RETURN(ret, SUCCESS, "socketAccept error.");
+            LOG_INFO("[socket]connect:%d port:%u client addr:%s", server_socket.conn_fd, server_socket.port,
+                                                    inet_ntoa(server_socket.clientAddr.sin_addr));
 
-                ret = threadPoolAddTask(thread_pool, httpServerRequest, (void*)&server_socket);
-                CHECK_RETURN(ret, SUCCESS, "threadPoolAddTask error.");
-            }
+            ret = threadPoolAddTask(thread_pool, httpServerRequest, (void*)&server_socket);
+            CHECK_RETURN(ret, SUCCESS, "threadPoolAddTask error.");
         }
     }
 

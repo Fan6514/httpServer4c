@@ -47,7 +47,5 @@ int httpServerRun(int port, int pollSize, int pollCoreSize);
 int httpServerStartUp(int port, int pollSize, int pollCoreSize, ThreadPool **ppThread_pool, 
                         int *epoll_fd, SERVER_SOCKET *server_socket);
 void httpServerRequest(void* arg);
-int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data);
-int parseHttpRequestHead(char *head_buf, HTTP_REQUEST_DATA *http_data);
 
 #endif

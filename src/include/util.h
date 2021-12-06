@@ -11,9 +11,9 @@
 typedef enum { false, true } __attribute__ ((packed)) boolean;
 
 #define SUCCESS         0
-#define PARA_ERROR      1
-#define RTN_ERROR       2
-#define MEM_ERROR       3
+#define PARA_ERROR      -1
+#define RTN_ERROR       -2
+#define MEM_ERROR       -3
 
 #define MAX_BUf_LEN         2048
 
@@ -85,7 +85,7 @@ do\
 {\
     if (NULL == ptr)\
     {\
-        return MEM_ERROR;\
+        return PARA_ERROR;\
     }\
 }while(0)
 
