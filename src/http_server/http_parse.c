@@ -17,8 +17,6 @@
 #include "http_parse.h"
 #include "util.h"
 
-int httpParseSplitWord
-
 /*******************************************************************************
  * @brief       读取缓冲区内的一行内容
  * @param[in]   buf : buffer
@@ -151,7 +149,7 @@ int getVersion(char *version, HTTP_REQUEST_DATA *http_data)
 
 /*******************************************************************************
  * @brief       解析获取的 http 请求报文行，包括请求方法、URL、协议版本
- * @param[in]   line : buffer
+ * @param[in]   line : request line
  * @param[out]  http_data : http data struct
  * @note        
  * @return
