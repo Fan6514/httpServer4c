@@ -17,6 +17,8 @@
 #include "http_parse.h"
 #include "util.h"
 
+int httpParseSplitWord
+
 /*******************************************************************************
  * @brief       读取缓冲区内的一行内容
  * @param[in]   buf : buffer
@@ -56,12 +58,138 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
     return lineIndex;
 }
 
+int splitWordBlack(char *line, char *word)
+{
+    int wordIndex = 0;
+
+    CHECK_POINT(buf);
+    CHECK_POINT(line);
+
+    /* 跳过字符串开头的空行和'\n' */
+    while(*line == ' ' || *line == '\n')
+    {
+        buf++;
+    }
+
+    while (*line != ' ' && *line != '\0' && *line != '\n')
+    {
+        pLine[wordIndex] = *buf;
+        wordIndex++;
+        buf++;
+    }
+
+    return wordIndex;
+}
+
+/*******************************************************************************
+ * @brief       解析获取的 http 请求报文头，包括host、content-length、cookie等
+ * @param[in]   line : buffer
+ * @param[out]  http_data : http data struct
+ * @note        
+ * @return
+ *              SUCCESS     解析成功
+********************************************************************************/
 int parseHttpRequestHead(char *head_buf, HTTP_REQUEST_DATA *http_data)
 {
     int ret = SUCCESS;
 
     CHECK_POINT(head_buf);
     CHECK_POINT(http_data);
+
+    return ret;
+}
+
+int getMethed(char *method, HTTP_REQUEST_DATA *http_data)
+{
+    int ret = SUCCESS;
+    HTTP_REQUEST_HEADER *pHead = NULL;
+    pHead = http_data->header;
+
+    if (strcasecmp(method, "GET"))
+    {
+        pHead->method = GET;
+        return ret;
+    }
+    else if (strcasecmp(method, "POST"))
+    {
+        pHead->method = POST;
+        return ret;
+    }
+    else
+    {
+        pHead->method = METHOD_NOT_SUPPORT;
+        ret = PARA_ERROR;
+    }
+
+    return ret;
+}
+
+int getVersion(char *version, HTTP_REQUEST_DATA *http_data)
+{
+    int ret = SUCCESS;
+    HTTP_REQUEST_HEADER *pHead = NULL;
+    pHead = http_data->header;
+
+    if (strcasecmp(version, "HTTP/1.0"))
+    {
+        pHead->version = HTTP_10;
+        return ret;
+    }
+    else if (strcasecmp(version, "HTTP/1.1"))
+    {
+        pHead->version = HTTP_11;
+        return ret;
+    }
+    else
+    {
+        pHead->version = VERSION_NOT_SUPPORT;
+        ret = PARA_ERROR;
+    }
+
+    return ret;
+}
+
+/*******************************************************************************
+ * @brief       解析获取的 http 请求报文行，包括请求方法、URL、协议版本
+ * @param[in]   line : buffer
+ * @param[out]  http_data : http data struct
+ * @note        
+ * @return
+ *              SUCCESS     解析成功
+********************************************************************************/
+int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_DATA *http_data)
+{
+    int readNum = 0;
+    int ret = SUCCESS;
+    HTTP_REQUEST_HEADER *pHead = NULL;
+    char word[MAX_LINE_LEN];
+
+    CHECK_POINT(line);
+    CHECK_POINT(http_data);
+
+    pHead = http_data->header;
+    memset(word, 0, sizeof(word));
+    if (*line != '\0')
+    {
+        /* request method */
+        readNum = splitWordBlack(line, word);
+        if (readNum <= 0) { break; }
+        ret = getMethed(word, http_data);
+        line += readNum;
+        memset(word, 0, sizeof(word));
+
+        /* request url */
+        readNum = splitWordBlack(line, word);
+        if (readNum <= 0) { break; }
+        strncpy(pHead->url, word, MAX_LINE_LEN);
+        line += readNum;
+        memset(word, 0, sizeof(word));
+
+        /* request http version */
+        readNum = splitWordBlack(line, word);
+        if (readNum <= 0) { break; }
+        ret = getVersion(word, http_data);
+    }
 
     return ret;
 }
@@ -76,7 +204,7 @@ int parseHttpRequestHead(char *head_buf, HTTP_REQUEST_DATA *http_data)
 ********************************************************************************/
 int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
 {
-    int nPos = 0;
+    int readNum = 0;
     int ret = SUCCESS;
     char *head_buf = NULL;
     char line[MAX_LINE_LEN];
@@ -89,14 +217,12 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
     GET_MEMORY(head_buf, char, MAX_HTTP_HEAD_LEN, finish);
 
     /* 获取报文头 */
-    while (0 != strncmp(line, "\r\n"))
+    while (*buf != "\0")
     {
-        if (temp_buf == strstr(temp_buf, "\r\n\r\n"))
-        {
-            break;
-        }
-        nPos++;
-        temp_buf++;
+        readNum = httpParseReadLine(buf, line, MAX_BUf_LEN, MAX_LINE_LEN);
+        if (readNum <= 0) { break; }
+
+        buf += readNum;
     }
     strncpy(head_buf, buf, nPos);
     LOG_DEBUG("[httpServer] head_buf:%s", head_buf);

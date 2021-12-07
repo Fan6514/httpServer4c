@@ -25,16 +25,18 @@ typedef struct
 
 typedef struct http_request_header
 {
-    HTTP_METHOD method;
-    HTTP_VERSION version;
-    HOST_ADDR host;
-    char *url;
-    boolean keep_alive;
+    HTTP_METHOD method;             /* 请求方法 */
+    HTTP_VERSION version;           /* http 协议版本 */
+    char *url;                      /* url */
+    HOST_ADDR host;                 /* 主机地址 */
+    boolean keep_alive;             /* 连接状态 */
+    char *cookie;                   /* Cookie */
+    int contentLen;                 /* 请求体长度 */
 }HTTP_REQUEST_HEADER;
 
 typedef struct http_request_data
 {
-    HTTP_REQUEST_HEADER header;
+    HTTP_REQUEST_HEADER *header;
     /* 后续增加 body 的数据 */
     char *body;
 }HTTP_REQUEST_DATA;
