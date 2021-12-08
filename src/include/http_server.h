@@ -17,11 +17,18 @@
 typedef enum { GET = 0, POST, PUT, DELETE, METHOD_NOT_SUPPORT }HTTP_METHOD;
 typedef enum { HTTP_10 = 0, HTTP_11, VERSION_NOT_SUPPORT }HTTP_VERSION;
 typedef enum { KEEP_ALIVE = 0 }HTTP_CONNECTION;
+typedef enum { PARSE_REQUEST_LINE = 0, PARSE_REQUEST_HEAD, PARSE_REQUEST_BODY }PARSE_STATE;
+
 typedef struct 
 {
     char *ip;
     int port;
 }HOST_ADDR;
+
+typedef struct http_state
+{
+    PARSE_STATE parse_state;        /* 解析报文的状态 */
+}HTTP_STATE;
 
 typedef struct http_request_header
 {
@@ -36,9 +43,9 @@ typedef struct http_request_header
 
 typedef struct http_request_data
 {
-    HTTP_REQUEST_HEADER *header;
-    /* 后续增加 body 的数据 */
-    char *body;
+    HTTP_STATE state;               /* http 处理的状态 */
+    HTTP_REQUEST_HEADER *header;    /* http 报文头 */
+    char *body;                     /* http 报文体 */
 }HTTP_REQUEST_DATA;
 
 /*--------------------------------------------------*/

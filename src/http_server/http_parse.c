@@ -23,7 +23,7 @@
  * @param[out]  pLine : the first line in buf
  * @param[in]   maxBufSum : the max buf size
  * @param[in]   maxLineSum : the max line size
- * @note        输出参数 pLine 以 '\0' 结尾，不包含 '\n'.
+ * @note        输出参数 pLine 以 '\0' 结尾，包含 '\n'.
  * @return
  *              PARA_ERROR  入参错误
  *              lineIndex   读取行的字符数
@@ -45,12 +45,14 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
         buf++;
     }
 
-    while (*buf != '\0' && *buf != '\n' && lineIndex < maxLineSum)
+    while (*buf != '\0' && *buf != '\n' && lineIndex < maxLineSum -1)
     {
         pLine[lineIndex] = *buf;
         lineIndex++;
         buf++;
     }
+    pLine[lineIndex] = '\n';
+    lineIndex++;
     pLine[lineIndex] = '\0';
     
     return lineIndex;
@@ -87,21 +89,19 @@ int splitWordBlack(char *line, char *word)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpRequestHead(char *head_buf, HTTP_REQUEST_DATA *http_data)
+int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
 {
     int ret = SUCCESS;
 
-    CHECK_POINT(head_buf);
-    CHECK_POINT(http_data);
+    CHECK_POINT(line);
+    CHECK_POINT(pHead);
 
     return ret;
 }
 
-int getMethed(char *method, HTTP_REQUEST_DATA *http_data)
+int getMethed(char *method, HTTP_REQUEST_HEADER *pHead)
 {
     int ret = SUCCESS;
-    HTTP_REQUEST_HEADER *pHead = NULL;
-    pHead = http_data->header;
 
     if (strcasecmp(method, "GET"))
     {
@@ -122,11 +122,9 @@ int getMethed(char *method, HTTP_REQUEST_DATA *http_data)
     return ret;
 }
 
-int getVersion(char *version, HTTP_REQUEST_DATA *http_data)
+int getVersion(char *version, HTTP_REQUEST_HEADER *pHead)
 {
     int ret = SUCCESS;
-    HTTP_REQUEST_HEADER *pHead = NULL;
-    pHead = http_data->header;
 
     if (strcasecmp(version, "HTTP/1.0"))
     {
@@ -155,24 +153,22 @@ int getVersion(char *version, HTTP_REQUEST_DATA *http_data)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_DATA *http_data)
+int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
 {
     int readNum = 0;
     int ret = SUCCESS;
-    HTTP_REQUEST_HEADER *pHead = NULL;
     char word[MAX_LINE_LEN];
 
     CHECK_POINT(line);
-    CHECK_POINT(http_data);
+    CHECK_POINT(pHead);
 
-    pHead = http_data->header;
     memset(word, 0, sizeof(word));
     if (*line != '\0')
     {
         /* request method */
         readNum = splitWordBlack(line, word);
         if (readNum <= 0) { break; }
-        ret = getMethed(word, http_data);
+        ret = getMethed(word, pHead);
         line += readNum;
         memset(word, 0, sizeof(word));
 
@@ -186,7 +182,7 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_DATA *http_data)
         /* request http version */
         readNum = splitWordBlack(line, word);
         if (readNum <= 0) { break; }
-        ret = getVersion(word, http_data);
+        ret = getVersion(word, pHead);
     }
 
     return ret;
@@ -204,8 +200,9 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
 {
     int readNum = 0;
     int ret = SUCCESS;
-    char *head_buf = NULL;
     char line[MAX_LINE_LEN];
+    HTTP_REQUEST_HEADER *pHead = NULL;
+
 
     CHECK_POINT(buf);
     CHECK_POINT(http_data);
@@ -213,21 +210,34 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
     memset(http_data, 0, sizeof(HTTP_REQUEST_DATA));
     memset(line, 0, MAX_LINE_LEN);
     GET_MEMORY(head_buf, char, MAX_HTTP_HEAD_LEN, finish);
+    pHead = http_data->header;
 
-    /* 获取报文头 */
+    /* 解析报文内容 */
     while (*buf != "\0")
     {
         readNum = httpParseReadLine(buf, line, MAX_BUf_LEN, MAX_LINE_LEN);
-        if (readNum <= 0) { break; }
+        if (strcasecmp(line, "\n"))
 
+        switch (http_data->state.parse_state)
+        {
+            case PARSE_REQUEST_LINE:
+                ret = parseHttpRequestMsgLine(line, pHead);
+                if (SUCCESS == ret) { http_data->state.parse_state = PARSE_REQUEST_HEAD; }
+                break;
+            case PARSE_REQUEST_HEAD:
+                ret = parseHttpRequestMsgHead(line, pHead);
+                break;
+            case PARSE_REQUEST_BODY:
+                break;
+            default:
+                break;
+        }
         buf += readNum;
+        memset(line, 0, MAX_LINE_LEN);
     }
-    strncpy(head_buf, buf, nPos);
-    LOG_DEBUG("[httpServer] head_buf:%s", head_buf);
 
-    ret = parseHttpRequestHead(head_buf, http_data);
-    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] parseHttpRequestHead error.");
-    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", http_data->header.method, http_data->header.version, 
+    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", http_data->header.method, 
+                                                            http_data->header.version, 
                                                             http_data->header.url);
 
 finish:

@@ -24,19 +24,21 @@ void httpServerRequest(void *arg)
     server_socket = (SERVER_SOCKET *)arg;
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
 
-    ret = socketRecv(server_socket, buf);
-    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket recv msg error.");
-    ret = parseHttpData(buf, &http_data);
-    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error.");
+    while(true){
+        ret = socketRecv(server_socket, buf);
+        CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket recv msg error.");
+        ret = parseHttpData(buf, &http_data);
+        CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error.");
 
-    switch(http_data.header.method)
-    {
-        case GET:
-            //do_requestForGet();
-        case POST:
-            //do_requestForPost();
-        default:
-            break;
+        switch(http_data.header.method)
+        {
+            case GET:
+                //do_requestForGet();
+            case POST:
+                //do_requestForPost();
+            default:
+                break;
+        }
     }
 
 finish:
