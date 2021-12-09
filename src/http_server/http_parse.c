@@ -62,8 +62,8 @@ int splitWordBlack(char *line, char *word)
 {
     int wordIndex = 0;
 
-    CHECK_POINT(buf);
     CHECK_POINT(line);
+    CHECK_POINT(word);
 
     /* 跳过字符串开头的空行和'\n' */
     while(*line == ' ' || *line == '\n')
@@ -76,6 +76,37 @@ int splitWordBlack(char *line, char *word)
         pLine[wordIndex] = *buf;
         wordIndex++;
         buf++;
+    }
+
+    return wordIndex;
+}
+
+int spliteWordColon(char *line, char *key, char *value)
+{
+    int keyIndex = 0;
+    int valueIndex = 0;
+
+    CHECK_POINT(buf);
+    CHECK_POINT(line);
+
+    /* 跳过字符串开头的空行和'\n' */
+    while(*line == ' ' || *line == '\n')
+    {
+        buf++;
+    }
+
+    while (*line != '\0' && *line != '\n' && *line != ':')
+    {
+        key[keyIndex] = *line;
+        keyIndex++;
+        line++;
+    }
+    line++;
+    while (*line != '\0' && *line != '\n')
+    {
+        value[valueIndex] = *line;
+        valueIndex++;
+        line++;
     }
 
     return wordIndex;

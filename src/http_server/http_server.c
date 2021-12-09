@@ -12,25 +12,66 @@
 
 extern struct epoll_event *events;
 
+void httpServerDataInit(HTTP_REQUEST_DATA **ppHttp_data)
+{
+    char *body = NULL;
+    HTTP_REQUEST_HEADER *pHeader = NULL;
+    HTTP_STATE *pState = NULL;
+
+    CHECK_POINT_NORTN(ppHttp_data);
+    CHECK_POINT_NORTN(*ppHttp_data);
+
+    GET_MEMORY(body, char, MAX_HTTP_BODY_LEN, error);
+    GET_MEMORY(pHeader, HTTP_REQUEST_HEADER, sizeof(HTTP_REQUEST_HEADER), error);
+    GET_MEMORY(pState, HTTP_STATE, sizeof(HTTP_STATE), error);
+
+    *ppHttp_data->state = pState;
+    *ppHttp_data->header = pHeader;
+    *ppHttp_data->body = body;
+
+error:
+    REL_MEMORY(body);
+    REL_MEMORY(pHeader);
+    REL_MEMORY(pState);
+}
+
+void httpServerDataUninit(HTTP_REQUEST_DATA **ppHttp_data)
+{
+    REL_MEMORY(*ppHttp_data->state);
+    REL_MEMORY(*ppHttp_data->header);
+    REL_MEMORY(*ppHttp_data->body);
+}
+
+/*******************************************************************************
+ * @brief       http 请求处理函数
+ * @param[in]   arg : arg
+ * @note        
+ * @return
+********************************************************************************/
 void httpServerRequest(void *arg)
 {
     int ret = 0;
     char *buf = NULL;
     SERVER_SOCKET *server_socket = NULL;
-    HTTP_REQUEST_DATA http_data;
+    HTTP_REQUEST_DATA *pHttp_data = NULL;
+    HTTP_REQUEST_HEADER *pHeader = NULL;
 
     CHECK_POINT_NORTN(arg);
     
     server_socket = (SERVER_SOCKET *)arg;
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
+    GET_MEMORY(pHttp_data, HTTP_REQUEST_DATA, sizeof(HTTP_REQUEST_DATA), finish);
+    httpServerDataInit(&pHttp_data);
+
+    pHeader = pHttp_data->header;
 
     while(true){
         ret = socketRecv(server_socket, buf);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket recv msg error.");
-        ret = parseHttpData(buf, &http_data);
+        ret = parseHttpData(buf, pHttp_data);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error.");
 
-        switch(http_data.header.method)
+        switch(pHeader->method)
         {
             case GET:
                 //do_requestForGet();
@@ -43,6 +84,7 @@ void httpServerRequest(void *arg)
 
 finish:
     REL_MEMORY(buf);
+    httpServerDataUninit(&http_data);
 }
 
 int httpServerStartUp(int port, int pollSize, int pollCoreSize, ThreadPool **ppThread_pool, 

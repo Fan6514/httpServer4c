@@ -8,7 +8,10 @@
 */
 /*--------------------------------------------------*/
 #define MAX_IPADDR_LEN      15
+#define MAX_COOKIES_LEN     125
+#define MAX_URL_LEN         1024
 #define MAX_HTTP_HEAD_LEN   1024
+#define MAX_HTTP_BODY_LEN   10240
 
 /*--------------------------------------------------*/
 /* 数据结构 
@@ -34,16 +37,16 @@ typedef struct http_request_header
 {
     HTTP_METHOD method;             /* 请求方法 */
     HTTP_VERSION version;           /* http 协议版本 */
-    char *url;                      /* url */
+    char url[MAX_URL_LEN];          /* url */
     HOST_ADDR host;                 /* 主机地址 */
     boolean keep_alive;             /* 连接状态 */
-    char *cookie;                   /* Cookie */
+    char cookie[MAX_COOKIES_LEN];   /* Cookie */
     int contentLen;                 /* 请求体长度 */
 }HTTP_REQUEST_HEADER;
 
 typedef struct http_request_data
 {
-    HTTP_STATE state;               /* http 处理的状态 */
+    HTTP_STATE *state;              /* http 处理的状态 */
     HTTP_REQUEST_HEADER *header;    /* http 报文头 */
     char *body;                     /* http 报文体 */
 }HTTP_REQUEST_DATA;
