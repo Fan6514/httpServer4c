@@ -65,7 +65,8 @@ void httpServerRequest(void *arg)
 
     pHeader = pHttp_data->header;
 
-    while(true){
+    while(true)
+    {
         ret = socketRecv(server_socket, buf);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket recv msg error.");
         ret = parseHttpData(buf, pHttp_data);
