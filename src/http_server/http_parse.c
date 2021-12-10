@@ -13,6 +13,7 @@
  * <h2><center>&copy;COPYRIGHT 2021 WELLCASA All Rights Reserved.</center></h2>
 ********************************************************************************/
 #include <stdio.h>
+#include <string.h>
 
 #include "http_parse.h"
 #include "util.h"
@@ -68,12 +69,12 @@ int splitWordBlack(char *line, char *word)
     /* 跳过字符串开头的空行和'\n' */
     while(*line == ' ' || *line == '\n')
     {
-        buf++;
+        line++;
     }
 
     while (*line != ' ' && *line != '\0' && *line != '\n')
     {
-        pLine[wordIndex] = *buf;
+        line[wordIndex] = *buf;
         wordIndex++;
         buf++;
     }
@@ -86,13 +87,14 @@ int spliteWordColon(char *line, char *key, char *value)
     int keyIndex = 0;
     int valueIndex = 0;
 
-    CHECK_POINT(buf);
     CHECK_POINT(line);
+    CHECK_POINT(key);
+    CHECK_POINT(value);
 
     /* 跳过字符串开头的空行和'\n' */
     while(*line == ' ' || *line == '\n')
     {
-        buf++;
+        line++;
     }
 
     while (*line != '\0' && *line != '\n' && *line != ':')
@@ -109,7 +111,7 @@ int spliteWordColon(char *line, char *key, char *value)
         line++;
     }
 
-    return wordIndex;
+    return valueIndex;
 }
 
 /*******************************************************************************
@@ -198,21 +200,18 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     {
         /* request method */
         readNum = splitWordBlack(line, word);
-        if (readNum <= 0) { break; }
         ret = getMethed(word, pHead);
         line += readNum;
         memset(word, 0, sizeof(word));
 
         /* request url */
         readNum = splitWordBlack(line, word);
-        if (readNum <= 0) { break; }
         strncpy(pHead->url, word, MAX_LINE_LEN);
         line += readNum;
         memset(word, 0, sizeof(word));
 
         /* request http version */
         readNum = splitWordBlack(line, word);
-        if (readNum <= 0) { break; }
         ret = getVersion(word, pHead);
     }
 
@@ -240,20 +239,19 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
 
     memset(http_data, 0, sizeof(HTTP_REQUEST_DATA));
     memset(line, 0, MAX_LINE_LEN);
-    GET_MEMORY(head_buf, char, MAX_HTTP_HEAD_LEN, finish);
     pHead = http_data->header;
 
     /* 解析报文内容 */
-    while (*buf != "\0")
+    while (*buf != '\0')
     {
         readNum = httpParseReadLine(buf, line, MAX_BUf_LEN, MAX_LINE_LEN);
         if (strcasecmp(line, "\n"))
 
-        switch (http_data->state.parse_state)
+        switch (http_data->state->parse_state)
         {
             case PARSE_REQUEST_LINE:
                 ret = parseHttpRequestMsgLine(line, pHead);
-                if (SUCCESS == ret) { http_data->state.parse_state = PARSE_REQUEST_HEAD; }
+                if (SUCCESS == ret) { http_data->state->parse_state = PARSE_REQUEST_HEAD; }
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pHead);
@@ -267,9 +265,9 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
         memset(line, 0, MAX_LINE_LEN);
     }
 
-    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", http_data->header.method, 
-                                                            http_data->header.version, 
-                                                            http_data->header.url);
+    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", http_data->header->method, 
+                                                            http_data->header->version, 
+                                                            http_data->header->url);
 
 finish:
     REL_MEMORY(head_buf);

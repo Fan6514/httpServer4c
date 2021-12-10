@@ -2,6 +2,8 @@
 #define _HTTP_SERVER_H_
 
 #include "util.h"
+#include "socket.h"
+#include "thread_pool.h"
 
 /*--------------------------------------------------*/
 /* 宏定义

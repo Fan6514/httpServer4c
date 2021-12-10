@@ -4,8 +4,6 @@
 #include <arpa/inet.h>
 
 #include "epoll.h"
-#include "socket.h"
-#include "thread_pool.h"
 #include "http_server.h"
 #include "http_parse.h"
 #include "util.h"
