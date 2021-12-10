@@ -5,11 +5,14 @@ STD = -std=gnu99
 
 ALL: serv
 
-serv: main.o http_server.o socket.o epoll.o logger.o thread_pool.o
-	gcc -o serv ${CFLAGS} ${LIB} ${STD} main.o http_server.o socket.o epoll.o logger.o thread_pool.o
+serv: main.o http_parse.o http_server.o socket.o epoll.o logger.o thread_pool.o
+	gcc -o serv ${CFLAGS} ${LIB} ${STD} main.o http_parse.o http_server.o socket.o epoll.o logger.o thread_pool.o
 
 main.o: main.c
 	gcc -c ${INCLUDE} ${STD} main.c
+
+http_parse.o: http_server/http_parse.c
+	gcc -c ${INCLUDE} ${STD} http_server/http_parse.c
 
 http_server.o: http_server/http_server.c
 	gcc -c ${INCLUDE} ${STD} http_server/http_server.c
