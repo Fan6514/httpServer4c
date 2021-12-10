@@ -7,11 +7,6 @@
 /* 宏定义
 */
 /*--------------------------------------------------*/
-#define SUCCESS         0
-#define PARA_ERROR      1
-#define RTN_ERROR       2
-#define MEM_ERROR       3
-
 #define PROCESS_THREAD_NUM   10
 
 typedef enum thread_state

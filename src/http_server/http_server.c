@@ -25,9 +25,9 @@ void httpServerDataInit(HTTP_REQUEST_DATA **ppHttp_data)
     GET_MEMORY(pHeader, HTTP_REQUEST_HEADER, sizeof(HTTP_REQUEST_HEADER), error);
     GET_MEMORY(pState, HTTP_STATE, sizeof(HTTP_STATE), error);
 
-    *ppHttp_data->state = pState;
-    *ppHttp_data->header = pHeader;
-    *ppHttp_data->body = body;
+    (*ppHttp_data)->state = pState;
+    (*ppHttp_data)->header = pHeader;
+    (*ppHttp_data)->body = body;
 
 error:
     REL_MEMORY(body);
@@ -37,9 +37,9 @@ error:
 
 void httpServerDataUninit(HTTP_REQUEST_DATA **ppHttp_data)
 {
-    REL_MEMORY(*ppHttp_data->state);
-    REL_MEMORY(*ppHttp_data->header);
-    REL_MEMORY(*ppHttp_data->body);
+    REL_MEMORY((*ppHttp_data)->state);
+    REL_MEMORY((*ppHttp_data)->header);
+    REL_MEMORY((*ppHttp_data)->body);
 }
 
 /*******************************************************************************
@@ -84,7 +84,7 @@ void httpServerRequest(void *arg)
 
 finish:
     REL_MEMORY(buf);
-    httpServerDataUninit(&http_data);
+    httpServerDataUninit(&pHttp_data);
 }
 
 int httpServerStartUp(int port, int pollSize, int pollCoreSize, ThreadPool **ppThread_pool, 
