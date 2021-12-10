@@ -74,9 +74,9 @@ int splitWordBlack(char *line, char *word)
 
     while (*line != ' ' && *line != '\0' && *line != '\n')
     {
-        line[wordIndex] = *buf;
+        word[wordIndex] = *line;
         wordIndex++;
-        buf++;
+        line++;
     }
 
     return wordIndex;
@@ -270,6 +270,5 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
                                                             http_data->header->url);
 
 finish:
-    REL_MEMORY(head_buf);
     return ret;
 }
