@@ -233,7 +233,6 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
     char line[MAX_LINE_LEN];
     HTTP_REQUEST_HEADER *pHead = NULL;
 
-
     CHECK_POINT(buf);
     CHECK_POINT(http_data);
 
@@ -245,7 +244,8 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
     while (*buf != '\0')
     {
         readNum = httpParseReadLine(buf, line, MAX_BUf_LEN, MAX_LINE_LEN);
-        if (strcasecmp(line, "\n"))
+        LOG_INFO("Read line: %s", line);
+        buf += readNum;
 
         switch (http_data->state->parse_state)
         {
@@ -261,7 +261,6 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
             default:
                 break;
         }
-        buf += readNum;
         memset(line, 0, MAX_LINE_LEN);
     }
 

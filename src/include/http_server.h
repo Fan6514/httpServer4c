@@ -26,7 +26,7 @@ typedef enum { PARSE_REQUEST_LINE = 0, PARSE_REQUEST_HEAD, PARSE_REQUEST_BODY }P
 
 typedef struct 
 {
-    char *ip;
+    char ip[MAX_IPADDR_LEN];
     int port;
 }HOST_ADDR;
 

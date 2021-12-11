@@ -23,6 +23,8 @@ void httpServerDataInit(HTTP_REQUEST_DATA **ppHttp_data)
     GET_MEMORY(pHeader, HTTP_REQUEST_HEADER, sizeof(HTTP_REQUEST_HEADER), error);
     GET_MEMORY(pState, HTTP_STATE, sizeof(HTTP_STATE), error);
 
+    pState->parse_state = PARSE_REQUEST_LINE;
+
     (*ppHttp_data)->state = pState;
     (*ppHttp_data)->header = pHeader;
     (*ppHttp_data)->body = body;

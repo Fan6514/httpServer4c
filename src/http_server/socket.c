@@ -100,7 +100,7 @@ int socketRecv(SERVER_SOCKET* http_socket, char* buf)
     memset(buf, 0, MAX_BUf_LEN);
     ret = recv(http_socket->conn_fd, buf, MAX_BUf_LEN, 0);
     ret = ret > 0 ? SUCCESS : RTN_ERROR;
-    LOG_DEBUG("%s", buf);
+    LOG_INFO("%s", buf);
 
     return ret;
 }
