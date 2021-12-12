@@ -21,19 +21,16 @@ void httpServerDataInit(HTTP_REQUEST_DATA **ppHttp_data)
     GET_MEMORY(body, char, MAX_HTTP_BODY_LEN, error);
     GET_MEMORY(pHeader, HTTP_REQUEST_HEADER, sizeof(HTTP_REQUEST_HEADER), error);
 
-    (*ppHttp_data)->state = pState;
     (*ppHttp_data)->header = pHeader;
     (*ppHttp_data)->body = body;
 
 error:
     REL_MEMORY(body);
     REL_MEMORY(pHeader);
-    REL_MEMORY(pState);
 }
 
 void httpServerDataUninit(HTTP_REQUEST_DATA **ppHttp_data)
 {
-    REL_MEMORY((*ppHttp_data)->state);
     REL_MEMORY((*ppHttp_data)->header);
     REL_MEMORY((*ppHttp_data)->body);
 }
@@ -58,7 +55,7 @@ void httpServerRequest(void *arg)
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
     GET_MEMORY(pHttp_data, HTTP_REQUEST_DATA, sizeof(HTTP_REQUEST_DATA), finish);
     httpServerDataInit(&pHttp_data);
-    LOG_DEBUG("%d\n", pHttp_data->state->parse_state);
+    LOG_DEBUG("%d\n", pHttp_data->state.parse_state);
 
     pHeader = pHttp_data->header;
 

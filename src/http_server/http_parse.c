@@ -208,14 +208,14 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
         LOG_INFO("Read line: %s", line);
         buf += readNum;
 
-        LOG_INFO("Read state: %d", http_data->state->parse_state);
+        LOG_INFO("Read state: %d", http_data->state.parse_state);
 
         switch (http_data->state.parse_state)
         {
             case PARSE_REQUEST_LINE:
                 LOG_DEBUG("Start read line");
                 ret = parseHttpRequestMsgLine(line, pHead);
-                if (SUCCESS == ret) { http_data->state->parse_state = PARSE_REQUEST_HEAD; }
+                if (SUCCESS == ret) { http_data->state.parse_state = PARSE_REQUEST_HEAD; }
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pHead);
