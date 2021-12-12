@@ -163,7 +163,7 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
         /* request method */
         readNum = splitStr(line, word, " ");
         LOG_INFO("method: %s", word[0]);
-        ret = getMethed(word, pHead);
+        ret = getMethed(word[0], pHead);
 
         /* request url */
         strncpy(pHead->url, word[1], MAX_LINE_LEN);
