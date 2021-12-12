@@ -52,9 +52,8 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
         lineIndex++;
         buf++;
     }
-    pLine[lineIndex] = '\n';
-    lineIndex++;
     pLine[lineIndex] = '\0';
+    lineIndex++;
     
     return lineIndex;
 }
@@ -200,18 +199,21 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     {
         /* request method */
         readNum = splitWordBlack(line, word);
+        LOG_INFO("method: %s", word);
         ret = getMethed(word, pHead);
         line += readNum;
         memset(word, 0, sizeof(word));
 
         /* request url */
         readNum = splitWordBlack(line, word);
+        LOG_INFO("method: %s", word);
         strncpy(pHead->url, word, MAX_LINE_LEN);
         line += readNum;
         memset(word, 0, sizeof(word));
 
         /* request http version */
         readNum = splitWordBlack(line, word);
+        LOG_INFO("method: %s", word);
         ret = getVersion(word, pHead);
     }
 
