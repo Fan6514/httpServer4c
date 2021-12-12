@@ -67,9 +67,9 @@ int splitStr(char *line, char (*word)[MAX_LINE_LEN], const char *delim)
     CHECK_POINT(line);
     CHECK_POINT(word);
 
-    while ((word = strtok_r(line, " ", &lineTemp)) != NULL)
+    while ((subStr = strtok_r(line, delim, &lineTemp)) != NULL)
     {
-        strncpy(word[wordIndex], word, MAX_LINE_LEN);
+        strncpy(word[wordIndex], subStr, MAX_LINE_LEN);
         wordIndex++;
     }
 
