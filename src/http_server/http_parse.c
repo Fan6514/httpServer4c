@@ -54,7 +54,7 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
     }
     pLine[lineIndex] = '\0';
     lineIndex++;
-    
+
     return lineIndex;
 }
 
@@ -157,6 +157,8 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     CHECK_POINT(line);
     CHECK_POINT(pHead);
 
+    LOG_INFO("line: %s", line);
+
     memset(word, 0, sizeof(word));
     if (*line != '\0')
     {
@@ -197,6 +199,8 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
     memset(line, 0, MAX_LINE_LEN);
     pHead = http_data->header;
 
+    http_data->state.parse_state = PARSE_REQUEST_LINE;
+
     /* 解析报文内容 */
     while (*buf != '\0')
     {
@@ -204,9 +208,12 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
         LOG_INFO("Read line: %s", line);
         buf += readNum;
 
-        switch (http_data->state->parse_state)
+        LOG_INFO("Read state: %d", http_data->state->parse_state);
+
+        switch (http_data->state.parse_state)
         {
             case PARSE_REQUEST_LINE:
+                LOG_DEBUG("Start read line");
                 ret = parseHttpRequestMsgLine(line, pHead);
                 if (SUCCESS == ret) { http_data->state->parse_state = PARSE_REQUEST_HEAD; }
                 break;

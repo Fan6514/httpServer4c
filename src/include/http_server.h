@@ -48,7 +48,7 @@ typedef struct http_request_header
 
 typedef struct http_request_data
 {
-    HTTP_STATE *state;              /* http 处理的状态 */
+    HTTP_STATE state;               /* http 处理的状态 */
     HTTP_REQUEST_HEADER *header;    /* http 报文头 */
     char *body;                     /* http 报文体 */
 }HTTP_REQUEST_DATA;
