@@ -58,59 +58,22 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
     return lineIndex;
 }
 
-int splitWordBlack(char *line, char *word)
+int splitStr(char *line, char (*word)[MAX_LINE_LEN], const char *delim)
 {
     int wordIndex = 0;
+    char *subStr = NULL;
+    char *lineTemp = NULL;
 
     CHECK_POINT(line);
     CHECK_POINT(word);
 
-    /* 跳过字符串开头的空行和'\n' */
-    while(*line == ' ' || *line == '\n')
+    while ((word = strtok_r(line, " ", &lineTemp)) != NULL)
     {
-        line++;
-    }
-
-    while (*line != ' ' && *line != '\0' && *line != '\n')
-    {
-        word[wordIndex] = *line;
+        strncpy(word[wordIndex], word, MAX_LINE_LEN);
         wordIndex++;
-        line++;
     }
 
     return wordIndex;
-}
-
-int spliteWordColon(char *line, char *key, char *value)
-{
-    int keyIndex = 0;
-    int valueIndex = 0;
-
-    CHECK_POINT(line);
-    CHECK_POINT(key);
-    CHECK_POINT(value);
-
-    /* 跳过字符串开头的空行和'\n' */
-    while(*line == ' ' || *line == '\n')
-    {
-        line++;
-    }
-
-    while (*line != '\0' && *line != '\n' && *line != ':')
-    {
-        key[keyIndex] = *line;
-        keyIndex++;
-        line++;
-    }
-    line++;
-    while (*line != '\0' && *line != '\n')
-    {
-        value[valueIndex] = *line;
-        valueIndex++;
-        line++;
-    }
-
-    return valueIndex;
 }
 
 /*******************************************************************************
@@ -189,7 +152,7 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
 {
     int readNum = 0;
     int ret = SUCCESS;
-    char word[MAX_LINE_LEN];
+    char word[3][MAX_LINE_LEN];
 
     CHECK_POINT(line);
     CHECK_POINT(pHead);
@@ -198,23 +161,15 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     if (*line != '\0')
     {
         /* request method */
-        readNum = splitWordBlack(line, word);
-        LOG_INFO("method: %s", word);
+        readNum = splitStr(line, word, " ");
+        LOG_INFO("method: %s", word[0]);
         ret = getMethed(word, pHead);
-        line += readNum;
-        memset(word, 0, sizeof(word));
 
         /* request url */
-        readNum = splitWordBlack(line, word);
-        LOG_INFO("method: %s", word);
-        strncpy(pHead->url, word, MAX_LINE_LEN);
-        line += readNum;
-        memset(word, 0, sizeof(word));
+        strncpy(pHead->url, word[1], MAX_LINE_LEN);
 
         /* request http version */
-        readNum = splitWordBlack(line, word);
-        LOG_INFO("method: %s", word);
-        ret = getVersion(word, pHead);
+        ret = getVersion(word[2], pHead);
     }
 
     return ret;
