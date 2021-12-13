@@ -58,7 +58,7 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
     return lineIndex;
 }
 
-int splitStr(char *line, char (*word)[MAX_LINE_LEN], const char *delim)
+int splitStr(char *line, char **word, const char *delim, int maxOutNum)
 {
     int wordIndex = 0;
     char *subStr = NULL;
@@ -72,6 +72,11 @@ int splitStr(char *line, char (*word)[MAX_LINE_LEN], const char *delim)
         line = NULL;
         strncpy(word[wordIndex], subStr, MAX_LINE_LEN);
         wordIndex++;
+
+        if (wordIndex >= maxOutNum)
+        {
+            break;
+        }
     }
 
     return wordIndex;
@@ -88,9 +93,28 @@ int splitStr(char *line, char (*word)[MAX_LINE_LEN], const char *delim)
 int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
 {
     int ret = SUCCESS;
+    char kvBuf[2][MAX_VALUE_LEN] = {0};
 
     CHECK_POINT(line);
     CHECK_POINT(pHead);
+
+    ret = splitStr(line, kvBuf, ":", 2);
+
+    if (strcasecmp(kvBuf[0], "Host"))
+    {
+        strncpy(pHead->host, kvBuf[1], MAX_VALUE_LEN);
+    }
+    else if (strcasecmp(kvBuf[0], "Connection"))
+    {
+        if (strcasecmp(kvBuf[1], "keep-alive"))
+        {
+            pHead->keep_alive = true;
+        }
+    }
+    else if (strcasecmp(kvBuf[0], "Cookies"))
+    {
+        strncpy(pHead->cookie, kvBuf[1], MAX_VALUE_LEN);
+    }
 
     return ret;
 }
@@ -163,7 +187,7 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     memset(word, 0, sizeof(word));
 
     /* request method */
-    readNum = splitStr(line, word, " ");
+    readNum = splitStr(line, word, " ", 3);
     LOG_INFO("method: %s", word[0]);
     ret = getMethed(word[0], pHead);
 
@@ -220,6 +244,7 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pHead);
+                LOG_INFO("[httpServer] host:%s\nkeep-alive:%d\n", pHead->host, pHead->keep_alive);
                 break;
             case PARSE_REQUEST_BODY:
                 break;

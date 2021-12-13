@@ -59,6 +59,9 @@ void httpServerRequest(void *arg)
     // httpServerDataInit(&pHttp_data);
 
     pHeader = pHttp_data->header;
+    pHeader->keep_alive = false;
+    pHeader->method = METHOD_NOT_SUPPORT;
+    pHeader->version = VERSION_NOT_SUPPORT;
 
     while(true)
     {

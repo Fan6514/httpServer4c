@@ -10,7 +10,9 @@
 */
 /*--------------------------------------------------*/
 #define MAX_IPADDR_LEN      15
+#define MAX_KEY_LEN         24
 #define MAX_COOKIES_LEN     125
+#define MAX_VALUE_LEN       512
 #define MAX_URL_LEN         1024
 #define MAX_HTTP_HEAD_LEN   1024
 #define MAX_HTTP_BODY_LEN   10240
@@ -24,11 +26,6 @@ typedef enum { HTTP_10 = 0, HTTP_11, VERSION_NOT_SUPPORT }HTTP_VERSION;
 typedef enum { KEEP_ALIVE = 0 }HTTP_CONNECTION;
 typedef enum { PARSE_REQUEST_LINE = 0, PARSE_REQUEST_HEAD, PARSE_REQUEST_BODY, PARSE_UNDEFINED }PARSE_STATE;
 
-typedef struct 
-{
-    char ip[MAX_IPADDR_LEN];
-    int port;
-}HOST_ADDR;
 
 typedef struct http_state
 {
@@ -40,7 +37,7 @@ typedef struct http_request_header
     HTTP_METHOD method;             /* 请求方法 */
     HTTP_VERSION version;           /* http 协议版本 */
     char url[MAX_URL_LEN];          /* url */
-    HOST_ADDR host;                 /* 主机地址 */
+    char host[MAX_VALUE_LEN];                 /* 主机地址 */
     boolean keep_alive;             /* 连接状态 */
     char cookie[MAX_COOKIES_LEN];   /* Cookie */
     int contentLen;                 /* 请求体长度 */
