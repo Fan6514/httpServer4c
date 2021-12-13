@@ -54,8 +54,9 @@ void httpServerRequest(void *arg)
     server_socket = (SERVER_SOCKET *)arg;
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
     GET_MEMORY(pHttp_data, HTTP_REQUEST_DATA, sizeof(HTTP_REQUEST_DATA), finish);
-    httpServerDataInit(&pHttp_data);
-    LOG_DEBUG("%d\n", pHttp_data->state.parse_state);
+    GET_MEMORY(pHttp_data->header, HTTP_REQUEST_HEADER, sizeof(HTTP_REQUEST_HEADER), finish);
+    GET_MEMORY(pHttp_data->body, char, MAX_HTTP_BODY_LEN, finish);
+    // httpServerDataInit(&pHttp_data);
 
     pHeader = pHttp_data->header;
 

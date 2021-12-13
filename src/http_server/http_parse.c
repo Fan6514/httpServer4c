@@ -161,19 +161,17 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     LOG_INFO("line: %s", line);
 
     memset(word, 0, sizeof(word));
-    if (*line != '\0')
-    {
-        /* request method */
-        readNum = splitStr(line, word, " ");
-        LOG_INFO("method: %s", word[0]);
-        ret = getMethed(word[0], pHead);
 
-        /* request url */
-        strncpy(pHead->url, word[1], MAX_LINE_LEN);
+    /* request method */
+    readNum = splitStr(line, word, " ");
+    LOG_INFO("method: %s", word[0]);
+    ret = getMethed(word[0], pHead);
 
-        /* request http version */
-        ret = getVersion(word[2], pHead);
-    }
+    /* request url */
+    strncpy(pHead->url, word[1], MAX_LINE_LEN);
+
+    /* request http version */
+    ret = getVersion(word[2], pHead);
 
     return ret;
 }
@@ -201,6 +199,7 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
     pHead = http_data->header;
 
     http_data->state.parse_state = PARSE_REQUEST_LINE;
+    LOG_DEBUG("%d\n", pHttp_data->state.parse_state);
 
     /* 解析报文内容 */
     while (*buf != '\0')

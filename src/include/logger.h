@@ -33,14 +33,14 @@ do\
 do\
 {\
     const log4c_location_info_t locinfo = LOG4C_LOCATION_INFO_INITIALIZER(NULL);\
-    log4c_category_log_locinfo(loggerCategory, &locinfo, LOG4C_PRIORITY_DEBUG, msg, ##args); \
+    log4c_category_log_locinfo(loggerCategory, &locinfo, LOG4C_PRIORITY_TRACE, msg, ##args); \
 }while(0)
 
 #define LOG_DEBUG(msg, args...)\
 do\
 {\
     const log4c_location_info_t locinfo = LOG4C_LOCATION_INFO_INITIALIZER(NULL);\
-    log4c_category_log_locinfo(loggerCategory, &locinfo, LOG4C_PRIORITY_TRACE, msg, ##args); \
+    log4c_category_log_locinfo(loggerCategory, &locinfo, LOG4C_PRIORITY_DEBUG, msg, ##args); \
 }while(0)
 
 #endif
