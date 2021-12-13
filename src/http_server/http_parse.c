@@ -184,22 +184,25 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
+int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
 {
     int readNum = 0;
     int ret = SUCCESS;
     char line[MAX_LINE_LEN];
     HTTP_REQUEST_HEADER *pHead = NULL;
+    HTTP_STATE state = PARSE_UNDEFINED;
 
     CHECK_POINT(buf);
-    CHECK_POINT(http_data);
+    CHECK_POINT(ppHttp_data);
+    CHECK_POINT(*ppHttp_data);
+    CHECK_POINT((*ppHttp_data)->header);
 
-    memset(http_data, 0, sizeof(HTTP_REQUEST_DATA));
     memset(line, 0, MAX_LINE_LEN);
-    pHead = http_data->header;
+    pHead = (*ppHttp_data)->header;
+    LOG_DEBUG("%p\n", http_data->header);
 
-    http_data->state.parse_state = PARSE_REQUEST_LINE;
-    LOG_DEBUG("%d\n", pHttp_data->state.parse_state);
+    state = (*ppHttp_data)->state.parse_state;
+    LOG_DEBUG("%u\n", state);
 
     /* 解析报文内容 */
     while (*buf != '\0')
@@ -208,14 +211,12 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
         LOG_INFO("Read line: %s", line);
         buf += readNum;
 
-        LOG_INFO("Read state: %d", http_data->state.parse_state);
-
-        switch (http_data->state.parse_state)
+        switch (state)
         {
             case PARSE_REQUEST_LINE:
                 LOG_DEBUG("Start read line");
                 ret = parseHttpRequestMsgLine(line, pHead);
-                if (SUCCESS == ret) { http_data->state.parse_state = PARSE_REQUEST_HEAD; }
+                if (SUCCESS == ret) { state = PARSE_REQUEST_HEAD; }
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pHead);
@@ -228,9 +229,9 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA *http_data)
         memset(line, 0, MAX_LINE_LEN);
     }
 
-    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", http_data->header->method, 
-                                                            http_data->header->version, 
-                                                            http_data->header->url);
+    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", pHead->method, 
+                                                            pHead->version, 
+                                                            pHead->url);
 
 finish:
     return ret;

@@ -64,7 +64,7 @@ void httpServerRequest(void *arg)
     {
         ret = socketRecv(server_socket, buf);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket recv msg error.");
-        ret = parseHttpData(buf, pHttp_data);
+        ret = parseHttpData(buf, &pHttp_data);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error.");
 
         switch(pHeader->method)
