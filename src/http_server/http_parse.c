@@ -190,7 +190,7 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
     int ret = SUCCESS;
     char line[MAX_LINE_LEN];
     HTTP_REQUEST_HEADER *pHead = NULL;
-    HTTP_STATE state = PARSE_UNDEFINED;
+    PARSE_STATE state = PARSE_UNDEFINED;
 
     CHECK_POINT(buf);
     CHECK_POINT(ppHttp_data);
@@ -199,7 +199,7 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
 
     memset(line, 0, MAX_LINE_LEN);
     pHead = (*ppHttp_data)->header;
-    LOG_DEBUG("%p\n", http_data->header);
+    LOG_DEBUG("%p\n", pHead);
 
     state = (*ppHttp_data)->state.parse_state;
     LOG_DEBUG("%u\n", state);
