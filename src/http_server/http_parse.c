@@ -82,43 +82,6 @@ int splitStr(char *line, char **word, const char *delim, int maxOutNum)
     return wordIndex;
 }
 
-/*******************************************************************************
- * @brief       解析获取的 http 请求报文头，包括host、content-length、cookie等
- * @param[in]   line : buffer
- * @param[out]  http_data : http data struct
- * @note        
- * @return
- *              SUCCESS     解析成功
-********************************************************************************/
-int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
-{
-    int ret = SUCCESS;
-    char kvBuf[2][MAX_VALUE_LEN] = {0};
-
-    CHECK_POINT(line);
-    CHECK_POINT(pHead);
-
-    ret = splitStr(line, kvBuf, ":", 2);
-
-    if (strcasecmp(kvBuf[0], "Host"))
-    {
-        strncpy(pHead->host, kvBuf[1], MAX_VALUE_LEN);
-    }
-    else if (strcasecmp(kvBuf[0], "Connection"))
-    {
-        if (strcasecmp(kvBuf[1], "keep-alive"))
-        {
-            pHead->keep_alive = true;
-        }
-    }
-    else if (strcasecmp(kvBuf[0], "Cookies"))
-    {
-        strncpy(pHead->cookie, kvBuf[1], MAX_VALUE_LEN);
-    }
-
-    return ret;
-}
-
 int getMethed(char *method, HTTP_REQUEST_HEADER *pHead)
 {
     int ret = SUCCESS;
@@ -201,6 +164,59 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
 }
 
 /*******************************************************************************
+ * @brief       解析获取的 http 请求报文头，包括host、content-length、cookie等
+ * @param[in]   line : buffer
+ * @param[out]  http_data : http data struct
+ * @note        
+ * @return
+ *              SUCCESS     解析成功
+********************************************************************************/
+int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
+{
+    int ret = SUCCESS;
+    char kvBuf[2][MAX_VALUE_LEN] = {0};
+
+    CHECK_POINT(line);
+    CHECK_POINT(pHead);
+
+    ret = splitStr(line, kvBuf, ":", 2);
+
+    if (strcasecmp(kvBuf[0], "Host"))
+    {
+        strncpy(pHead->host, kvBuf[1], MAX_VALUE_LEN);
+    }
+    else if (strcasecmp(kvBuf[0], "Connection"))
+    {
+        if (strcasecmp(kvBuf[1], "keep-alive"))
+        {
+            pHead->keep_alive = true;
+        }
+    }
+    else if (strcasecmp(kvBuf[0], "Cookies"))
+    {
+        strncpy(pHead->cookie, kvBuf[1], MAX_VALUE_LEN);
+    }
+
+    return ret;
+}
+
+/*******************************************************************************
+ * @brief       解析获取的 http 请求报文的请求正文
+ * @param[in]   line : buffer
+ * @param[out]  http_data : http data struct
+ * @note        
+ * @return
+ *              SUCCESS     解析成功
+********************************************************************************/
+int parseHttpRequestBody(char *line, char *pBody)
+{
+    CHECK_POINT(line);
+    CHECK_POINT(pBody);
+
+    strncat(pBody, line, MAX_HTTP_BODY_LEN);
+}
+
+/*******************************************************************************
  * @brief       解析获取的 http 报文内容，包括请求报文头和请求体
  * @param[in]   buf : buffer
  * @param[out]  http_data : http data struct
@@ -213,6 +229,7 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
     int readNum = 0;
     int ret = SUCCESS;
     char line[MAX_LINE_LEN];
+    char *pBody = NULL;
     HTTP_REQUEST_HEADER *pHead = NULL;
     PARSE_STATE state = PARSE_UNDEFINED;
 
@@ -223,10 +240,8 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
 
     memset(line, 0, MAX_LINE_LEN);
     pHead = (*ppHttp_data)->header;
-    LOG_DEBUG("%p\n", pHead);
-
     state = (*ppHttp_data)->state.parse_state;
-    LOG_DEBUG("%u\n", state);
+    pBody = (*ppHttp_data)->body;
 
     /* 解析报文内容 */
     while (*buf != '\0')
@@ -235,6 +250,10 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
         LOG_INFO("Read line: %s", line);
         buf += readNum;
 
+        if (*line == '\n')
+        {
+            state = PARSE_REQUEST_BODY;
+        }
         switch (state)
         {
             case PARSE_REQUEST_LINE:
@@ -247,6 +266,8 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
                 LOG_INFO("[httpServer] host:%s\nkeep-alive:%d\n", pHead->host, pHead->keep_alive);
                 break;
             case PARSE_REQUEST_BODY:
+                ret = parseHttpRequestBody(line, pBody);
+                LOG_INFO("[httpServer] body:%s\n", pBody);
                 break;
             default:
                 break;
