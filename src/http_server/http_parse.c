@@ -58,7 +58,7 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
     return lineIndex;
 }
 
-int splitStr(char *line, char **word, const char *delim, int maxOutNum)
+int splitStr(char *line, char word[][MAX_LINE_LEN], const char *delim, int maxOutNum)
 {
     int wordIndex = 0;
     char *subStr = NULL;
@@ -67,16 +67,11 @@ int splitStr(char *line, char **word, const char *delim, int maxOutNum)
     CHECK_POINT(line);
     CHECK_POINT(word);
 
-    while ((subStr = strtok_r(line, delim, &lineTemp)) != NULL)
+    while (wordIndex < maxOutNum && ((subStr = strtok_r(line, delim, &lineTemp)) != NULL))
     {
         line = NULL;
         strncpy(word[wordIndex], subStr, MAX_LINE_LEN);
         wordIndex++;
-
-        if (wordIndex >= maxOutNum)
-        {
-            break;
-        }
     }
 
     return wordIndex;
@@ -174,7 +169,7 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
 int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
 {
     int ret = SUCCESS;
-    char kvBuf[2][MAX_VALUE_LEN] = {0};
+    char kvBuf[2][MAX_LINE_LEN] = {0};
 
     CHECK_POINT(line);
     CHECK_POINT(pHead);
