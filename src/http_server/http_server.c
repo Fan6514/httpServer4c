@@ -73,9 +73,9 @@ void httpServerRequest(void *arg)
         switch(pHeader->method)
         {
             case GET:
-                //do_requestForGet();
+                //do_request4Get();
             case POST:
-                //do_requestForPost();
+                //do_request4Post();
             default:
                 break;
         }
