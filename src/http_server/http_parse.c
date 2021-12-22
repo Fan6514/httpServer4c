@@ -58,23 +58,49 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
     return lineIndex;
 }
 
-int splitStr(char *line, char word[][MAX_LINE_LEN], const char *delim, int maxOutNum)
+/*******************************************************************************
+ * @brief       分割字符串
+ * @param[in]   line : buffer
+ * @param[out]  word : words
+ * @param[in]   delim : the splite char
+ * @param[in]   maxOutNum : the nums of words
+********************************************************************************/
+void splitStr(char *line, char word[][MAX_LINE_LEN], const char delim, int maxOutNum)
 {
     int wordIndex = 0;
+    int strIndex = 0;
     char *subStr = NULL;
     char *lineTemp = NULL;
 
     CHECK_POINT(line);
     CHECK_POINT(word);
 
-    while (wordIndex < maxOutNum && ((subStr = strtok_r(line, delim, &lineTemp)) != NULL))
+    while (*line == ' ')
     {
-        line = NULL;
-        strncpy(word[wordIndex], subStr, MAX_LINE_LEN);
-        wordIndex++;
+        line++;
     }
 
-    return wordIndex;
+    lineTemp = line;
+    while (*lineTemp != '\0' && wordIndex < maxOutNum-1)
+    {
+        if (*lineTemp == delim)
+        {
+            wordIndex++;
+            lineTemp++;
+            strIndex = 0;
+            while (*lineTemp == ' ')
+            {
+                lineTemp++;
+            }
+            line = lineTemp;
+
+            continue;
+        }
+        word[wordIndex][strIndex] = *lineTemp;
+        strIndex++;
+        lineTemp++;
+    }
+    strncpy(word[wordIndex], line, MAX_LINE_LEN);
 }
 
 int getMethed(char *method, HTTP_REQUEST_HEADER *pHead)
@@ -145,7 +171,7 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     memset(word, 0, sizeof(word));
 
     /* request method */
-    readNum = splitStr(line, word, " ", 3);
+    splitStr(line, word, ' ', 3);
     LOG_INFO("method: %s", word[0]);
     ret = getMethed(word[0], pHead);
 
@@ -174,7 +200,7 @@ int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
     CHECK_POINT(line);
     CHECK_POINT(pHead);
 
-    ret = splitStr(line, kvBuf, ":", 2);
+    splitStr(line, kvBuf, ':', 2);
 
     if (strcasecmp(kvBuf[0], "Host"))
     {
@@ -198,7 +224,7 @@ int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
 /*******************************************************************************
  * @brief       解析获取的 http 请求报文的请求正文
  * @param[in]   line : buffer
- * @param[out]  http_data : http data struct
+ * @param[out]  pBody : http data body
  * @note        
  * @return
  *              SUCCESS     解析成功
@@ -245,20 +271,20 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
         LOG_INFO("Read line: %s", line);
         buf += readNum;
 
-        if (*line == '\n')
+        if (*line == '\n' || *line == '\r')
         {
             state = PARSE_REQUEST_BODY;
+            continue;
         }
         switch (state)
         {
             case PARSE_REQUEST_LINE:
-                LOG_DEBUG("Start read line");
                 ret = parseHttpRequestMsgLine(line, pHead);
                 if (SUCCESS == ret) { state = PARSE_REQUEST_HEAD; }
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pHead);
-                LOG_INFO("[httpServer] host:%s\nkeep-alive:%d\n", pHead->host, pHead->keep_alive);
+                LOG_INFO("[httpServer] host:%s keep-alive:%d\n", pHead->host, pHead->keep_alive);
                 break;
             case PARSE_REQUEST_BODY:
                 ret = parseHttpRequestBody(line, pBody);
