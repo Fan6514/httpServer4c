@@ -47,7 +47,7 @@ typedef struct http_request_header
     HTTP_VERSION version;           /* http 协议版本 */
     char url[MAX_URL_LEN];          /* url */
     char host[MAX_VALUE_LEN];                 /* 主机地址 */
-    boolean keep_alive;             /* 连接状态 */
+    BOOLEAN keep_alive;             /* 连接状态 */
     char cookie[MAX_COOKIES_LEN];   /* Cookie */
     int contentLen;                 /* 请求体长度 */
 }HTTP_REQUEST_HEADER;

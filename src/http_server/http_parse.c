@@ -205,7 +205,7 @@ int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pReqHead)
     {
         if (strcasecmp(kvBuf[1], "keep-alive"))
         {
-            pReqHead->keep_alive = true;
+            pReqHead->keep_alive = TRUE;
         }
     }
     else if (strcasecmp(kvBuf[0], "Cookies"))

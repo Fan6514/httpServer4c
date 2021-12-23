@@ -8,7 +8,7 @@
 */
 /*--------------------------------------------------*/
 /* Define a Boolean data type. (from linux kernel 2.6.0) */
-typedef enum { false, true } __attribute__ ((packed)) boolean;
+typedef enum { FALSE, TRUE } __attribute__ ((packed)) BOOLEAN;
 
 #define SUCCESS         0
 #define PARA_ERROR      -1

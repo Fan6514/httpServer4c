@@ -18,18 +18,18 @@ LD_LIBRARIES = -L$(CPPUTEST_HOME)/lib -lCppUTest -lCppUTestExt
 TARGET=UTEST_HTTP
 
 #自己定义有哪些文件
-OBJECTS=main.o http_parse.o utest_http_parse.o
+OBJECTS=main.o utest_http_parse.o
 SOURCES=main.cpp utest_http_parse.cpp
 
 $(TARGET):$(OBJECTS)
-    $(CXX) $^ $(LD_LIBRARIES) -o $@
+	$(CXX) $^ $(LD_LIBRARIES) -o $@
 
 
 .cpp.o:
-    $(CXX) $(FLAGS) $(CPPFLAGS) ${INCLUDE} $(CXXFLAGS) $< -o $@
+	$(CXX) $(FLAGS) $(CPPFLAGS) ${INCLUDE} $(CXXFLAGS) $< -o $@
 
 .c.o:
-    $(CXX) $(FLAGS) $(CPPFLAGS) ${INCLUDE} $(CFLAGS) $< -o $@
+	$(CXX) $(FLAGS) $(CPPFLAGS) ${INCLUDE} $(CFLAGS) $< -o $@
 
 clean:
-    rm *.o $(TARGET)
+	rm *.o $(TARGET)

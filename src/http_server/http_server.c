@@ -26,7 +26,7 @@ void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData)
     GET_MEMORY(pReqHeader, HTTP_REQUEST_HEADER, sizeof(HTTP_REQUEST_HEADER), error);
 
     /* 初始化请求报文头 */
-    pReqHeader->keep_alive = false;
+    pReqHeader->keep_alive = FALSE;
     pReqHeader->method = METHOD_NOT_SUPPORT;
     pReqHeader->version = VERSION_NOT_SUPPORT;
 
@@ -106,7 +106,7 @@ void httpServerEntry(void *arg)
     /* 初始化响应报文 */
     httpResponseDataInit(&pHttpResponseData);    
 
-    while(true)
+    while(TRUE)
     {
         /* 接收数据 */
         ret = socketRecv(server_socket, buf);
@@ -187,7 +187,7 @@ int httpServerRun(int port, int pollSize, int pollCoreSize)
     ret = httpServerStartUp(port, pollSize, pollCoreSize, &thread_pool, &epoll_fd, &server_socket);
     CHECK_RETURN_GOTO(ret, SUCCESS, finish, "httpServerStartUp error.");
 
-    while(true)
+    while(TRUE)
     {
         ret = epollWait(epoll_fd, &eventSum, events);
         if (SUCCESS != ret)
