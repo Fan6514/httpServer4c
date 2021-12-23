@@ -85,6 +85,7 @@ int socketUninit(SERVER_SOCKET* http_socket)
 
     close(http_socket->listen_fd);
     close(http_socket->conn_fd);
+    LOG_WARN("connect:%s is closed.", http_socket->clientAddr);
 
     memset(http_socket, 0, sizeof(http_socket));
 

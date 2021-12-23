@@ -103,46 +103,46 @@ void splitStr(char *line, char word[][MAX_LINE_LEN], const char delim, int maxOu
     strncpy(word[wordIndex], line, MAX_LINE_LEN);
 }
 
-int getMethed(char *method, HTTP_REQUEST_HEADER *pHead)
+int getMethed(char *method, HTTP_REQUEST_HEADER *pReqHead)
 {
     int ret = SUCCESS;
 
     if (strcasecmp(method, "GET"))
     {
-        pHead->method = GET;
+        pReqHead->method = GET;
         return ret;
     }
     else if (strcasecmp(method, "POST"))
     {
-        pHead->method = POST;
+        pReqHead->method = POST;
         return ret;
     }
     else
     {
-        pHead->method = METHOD_NOT_SUPPORT;
+        pReqHead->method = METHOD_NOT_SUPPORT;
         ret = PARA_ERROR;
     }
 
     return ret;
 }
 
-int getVersion(char *version, HTTP_REQUEST_HEADER *pHead)
+int getVersion(char *version, HTTP_REQUEST_HEADER *pReqHead)
 {
     int ret = SUCCESS;
 
     if (strcasecmp(version, "HTTP/1.0"))
     {
-        pHead->version = HTTP_10;
+        pReqHead->version = HTTP_10;
         return ret;
     }
     else if (strcasecmp(version, "HTTP/1.1"))
     {
-        pHead->version = HTTP_11;
+        pReqHead->version = HTTP_11;
         return ret;
     }
     else
     {
-        pHead->version = VERSION_NOT_SUPPORT;
+        pReqHead->version = VERSION_NOT_SUPPORT;
         ret = PARA_ERROR;
     }
 
@@ -157,14 +157,14 @@ int getVersion(char *version, HTTP_REQUEST_HEADER *pHead)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
+int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pReqHead)
 {
     int readNum = 0;
     int ret = SUCCESS;
     char word[3][MAX_LINE_LEN];
 
     CHECK_POINT(line);
-    CHECK_POINT(pHead);
+    CHECK_POINT(pReqHead);
 
     LOG_INFO("line: %s", line);
 
@@ -173,13 +173,13 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
     /* request method */
     splitStr(line, word, ' ', 3);
     LOG_INFO("method: %s", word[0]);
-    ret = getMethed(word[0], pHead);
+    ret = getMethed(word[0], pReqHead);
 
     /* request url */
-    strncpy(pHead->url, word[1], MAX_LINE_LEN);
+    strncpy(pReqHead->url, word[1], MAX_LINE_LEN);
 
     /* request http version */
-    ret = getVersion(word[2], pHead);
+    ret = getVersion(word[2], pReqHead);
 
     return ret;
 }
@@ -192,30 +192,30 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pHead)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pHead)
+int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pReqHead)
 {
     int ret = SUCCESS;
     char kvBuf[2][MAX_LINE_LEN] = {0};
 
     CHECK_POINT(line);
-    CHECK_POINT(pHead);
+    CHECK_POINT(pReqHead);
 
     splitStr(line, kvBuf, ':', 2);
 
     if (strcasecmp(kvBuf[0], "Host"))
     {
-        strncpy(pHead->host, kvBuf[1], MAX_VALUE_LEN);
+        strncpy(pReqHead->host, kvBuf[1], MAX_VALUE_LEN);
     }
     else if (strcasecmp(kvBuf[0], "Connection"))
     {
         if (strcasecmp(kvBuf[1], "keep-alive"))
         {
-            pHead->keep_alive = true;
+            pReqHead->keep_alive = true;
         }
     }
     else if (strcasecmp(kvBuf[0], "Cookies"))
     {
-        strncpy(pHead->cookie, kvBuf[1], MAX_VALUE_LEN);
+        strncpy(pReqHead->cookie, kvBuf[1], MAX_VALUE_LEN);
     }
 
     return ret;
@@ -245,24 +245,24 @@ int parseHttpRequestBody(char *line, char *pBody)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
+int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
 {
     int readNum = 0;
     int ret = SUCCESS;
     char line[MAX_LINE_LEN];
     char *pBody = NULL;
-    HTTP_REQUEST_HEADER *pHead = NULL;
+    HTTP_REQUEST_HEADER *pReqHead = NULL;
     PARSE_STATE state = PARSE_UNDEFINED;
 
     CHECK_POINT(buf);
-    CHECK_POINT(ppHttp_data);
-    CHECK_POINT(*ppHttp_data);
-    CHECK_POINT((*ppHttp_data)->header);
+    CHECK_POINT(ppHttpRequestData);
+    CHECK_POINT(*ppHttpRequestData);
+    CHECK_POINT((*ppHttpRequestData)->header);
 
     memset(line, 0, MAX_LINE_LEN);
-    pHead = (*ppHttp_data)->header;
-    state = (*ppHttp_data)->state.parse_state;
-    pBody = (*ppHttp_data)->body;
+    pReqHead = (*ppHttpRequestData)->header;
+    state = (*ppHttpRequestData)->state.parse_state;
+    pBody = (*ppHttpRequestData)->body;
 
     /* 解析报文内容 */
     while (*buf != '\0')
@@ -279,12 +279,12 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
         switch (state)
         {
             case PARSE_REQUEST_LINE:
-                ret = parseHttpRequestMsgLine(line, pHead);
+                ret = parseHttpRequestMsgLine(line, pReqHead);
                 if (SUCCESS == ret) { state = PARSE_REQUEST_HEAD; }
                 break;
             case PARSE_REQUEST_HEAD:
-                ret = parseHttpRequestMsgHead(line, pHead);
-                LOG_INFO("[httpServer] host:%s keep-alive:%d\n", pHead->host, pHead->keep_alive);
+                ret = parseHttpRequestMsgHead(line, pReqHead);
+                LOG_INFO("[httpServer] host:%s keep-alive:%d\n", pReqHead->host, pReqHead->keep_alive);
                 break;
             case PARSE_REQUEST_BODY:
                 ret = parseHttpRequestBody(line, pBody);
@@ -296,9 +296,9 @@ int parseHttpData(char *buf, HTTP_REQUEST_DATA **ppHttp_data)
         memset(line, 0, MAX_LINE_LEN);
     }
 
-    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", pHead->method, 
-                                                            pHead->version, 
-                                                            pHead->url);
+    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", pReqHead->method, 
+                                                            pReqHead->version, 
+                                                            pReqHead->url);
 
 finish:
     return ret;
