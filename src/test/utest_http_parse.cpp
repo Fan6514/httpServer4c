@@ -1,4 +1,6 @@
 #include "CppUTest/UtestMacros.h"
+#include <CppUTest/CommandLineTestRunner.h>
+#include <CppUTest/TestHarness.h>
 
 #ifdef __cplusplus
 extern "C" {

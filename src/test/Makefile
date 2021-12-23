@@ -2,7 +2,8 @@ CC=gcc
 CXX=g++
 
 #自己定义这个路径
-CPPUTEST_HOME=/usr/cpputest-3.4
+CPPUTEST_HOME=/usr
+INCLUDE = -I ./include -I /usr/log4c/include
 
 FLAGS= -c
 
@@ -25,10 +26,10 @@ $(TARGET):$(OBJECTS)
 
 
 .cpp.o:
-    $(CXX) $(FLAGS) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+    $(CXX) $(FLAGS) $(CPPFLAGS) ${INCLUDE} $(CXXFLAGS) $< -o $@
 
 .c.o:
-    $(CXX) $(FLAGS) $(CPPFLAGS) $(CFLAGS) $< -o $@
+    $(CXX) $(FLAGS) $(CPPFLAGS) ${INCLUDE} $(CFLAGS) $< -o $@
 
 clean:
     rm *.o $(TARGET)
