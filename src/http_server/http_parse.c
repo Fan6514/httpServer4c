@@ -72,8 +72,8 @@ void splitStr(char *line, char word[][MAX_LINE_LEN], const char delim, int maxOu
     char *subStr = NULL;
     char *lineTemp = NULL;
 
-    CHECK_POINT(line);
-    CHECK_POINT(word);
+    CHECK_POINT_NORTN(line);
+    CHECK_POINT_NORTN(word);
 
     while (*line == ' ')
     {
@@ -133,12 +133,10 @@ int getVersion(char *version, HTTP_REQUEST_HEADER *pReqHead)
     if (strcasecmp(version, "HTTP/1.0"))
     {
         pReqHead->version = HTTP_10;
-        return ret;
     }
     else if (strcasecmp(version, "HTTP/1.1"))
     {
         pReqHead->version = HTTP_11;
-        return ret;
     }
     else
     {
@@ -166,13 +164,10 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pReqHead)
     CHECK_POINT(line);
     CHECK_POINT(pReqHead);
 
-    LOG_INFO("line: %s", line);
-
     memset(word, 0, sizeof(word));
 
     /* request method */
     splitStr(line, word, ' ', 3);
-    LOG_INFO("method: %s", word[0]);
     ret = getMethed(word[0], pReqHead);
 
     /* request url */
@@ -252,7 +247,7 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
     char line[MAX_LINE_LEN];
     char *pBody = NULL;
     HTTP_REQUEST_HEADER *pReqHead = NULL;
-    PARSE_STATE state = PARSE_UNDEFINED;
+    PARSE_STATE *state = NULL;
 
     CHECK_POINT(buf);
     CHECK_POINT(ppHttpRequestData);
@@ -261,7 +256,7 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
 
     memset(line, 0, MAX_LINE_LEN);
     pReqHead = (*ppHttpRequestData)->header;
-    state = (*ppHttpRequestData)->state.parse_state;
+    *state = &(*ppHttpRequestData)->state.parse_state;
     pBody = (*ppHttpRequestData)->body;
 
     /* 解析报文内容 */
@@ -273,21 +268,25 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
 
         if (*line == '\n' || *line == '\r')
         {
-            state = PARSE_REQUEST_BODY;
+            *state = PARSE_REQUEST_BODY;
             continue;
         }
-        switch (state)
+        switch (*state)
         {
             case PARSE_REQUEST_LINE:
                 ret = parseHttpRequestMsgLine(line, pReqHead);
-                if (SUCCESS == ret) { state = PARSE_REQUEST_HEAD; }
+                if (SUCCESS == ret) { *state = PARSE_REQUEST_HEAD; }
+                LOG_DEBUG("[httpParse] method:%d url:%s version:%d", 
+                            pReqHead->method, pReqHead->url, pReqHead->version);
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pReqHead);
-                LOG_INFO("[httpServer] host:%s keep-alive:%d\n", pReqHead->host, pReqHead->keep_alive);
+                LOG_INFO("[httpServer] host:%s keep-alive:%d\n", 
+                        pReqHead->host, pReqHead->keep_alive);
                 break;
             case PARSE_REQUEST_BODY:
                 ret = parseHttpRequestBody(line, pBody);
+                *state = PARSE_COMPLATE;
                 LOG_INFO("[httpServer] body:%s\n", pBody);
                 break;
             default:

@@ -114,6 +114,11 @@ void httpServerEntry(void *arg)
         /* 解析请求报文 */
         ret = parseHttpRequestData(buf, &pHttpRequestData);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] parse http request data error.");
+
+        if (PARSE_COMPLATE != pHttpRequestData->state.parse_state)
+        {
+            continue;
+        }
         /* 处理请求报文 */
         ret = httpServerHandler(pHttpRequestData, pHttpResponseData);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] handle http request data error.");
