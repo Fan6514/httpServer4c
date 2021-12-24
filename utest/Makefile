@@ -1,23 +1,14 @@
-#Set this to @ to keep the makefile quiet
-ifndef SILENCE
-	SILENCE = @
-endif
-
-#---- Outputs ----#
-COMPONENT_NAME = CppUTestExt
-
-#--- Inputs ----#
-CPPUTEST_HOME = .
-CPP_PLATFORM = Gcc
-
-WARNINGFLAGS = -pedantic-errors -Wall -Wextra -Werror -Wshadow -Wswitch-default -Wswitch-enum -Wconversion
-
-SRC_DIRS = ../src/http_server
-	
-TEST_SRC_DIRS = ./
-
-INCLUDE_DIRS = ../src/include
-
-LD_LIBRARIES += -lstdc++ -L$(CPPUTEST_LIB_DIR)/$(TARGET_PLATFORM) -lCppUTest
-
-include $(CPPUTEST_HOME)/build/MakefileWorker.mk
+PROJECT_DIR=$(cd ../ && pwd)
+SRC_DIR=$(PROJECT_DIR)/src
+TEST_DIR=$(PROJECT_DIR)/utest
+# specify where the source code and includes are located
+INCLUDE_DIRS=$(SRC_DIR)/include
+SRC_DIRS=$(SRC_DIR)/http_server
+# specify where the test code is located
+TEST_SRC_DIRS = $(TEST_DIR)
+# what to call the test binary
+TEST_TARGET=example
+# where the cpputest library is located
+CPPUTEST_HOME=/usr/
+# run MakefileWorker.mk with the variables defined here
+include MakefileWorker.mk
