@@ -6,8 +6,8 @@
 extern "C" {
 #endif
 
-#include "../include/http_parse.h"
-int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
+#include "http_parse.h"
+extern int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
 
 #ifdef __cplusplus
 }
