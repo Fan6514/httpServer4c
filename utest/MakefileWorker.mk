@@ -15,6 +15,8 @@
 #
 #	INCLUDE_DIRS - Directories used to search for include files.
 #                   This generates a -I for each directory
+#	LIB_DIRS - Directories used to search for library files.
+#					This generates a -L for each directory
 #	SRC_DIRS - Directories containing source files to build into the library
 #	SRC_FILES - Specific source files to build into library. Helpful when not all code
 #				in a directory can be built for test (hopefully a temporary situation)
@@ -479,7 +481,7 @@ test-deps: $(TEST_DEPS)
 
 $(TEST_TARGET): $(TEST_DEPS)
 	@echo Linking $@
-	$(SILENCE)$(CXX) -o $@ $^ $(LD_LIBRARIES) $(LDFLAGS)
+	$(SILENCE)$(CXX) -o $@ $^ $(LD_LIBRARIES) $(LDFLAGS) -L$(LIB_DIRS)
 
 $(TARGET_LIB): $(OBJ)
 	@echo Building archive $@

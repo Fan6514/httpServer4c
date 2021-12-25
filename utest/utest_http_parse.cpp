@@ -6,8 +6,12 @@
 extern "C" {
 #endif
 
+#include "util.h"
 #include "http_parse.h"
-extern int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
+#include "http_server.h"
+int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
+int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)；
+void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData);
 
 #ifdef __cplusplus
 }
@@ -29,15 +33,36 @@ TEST_GROUP(utestHttpParse)
    void teardown()
    {
    }
+
+   HTTP_REQUEST_DATA *constructHttpRequestData()
+   {
+      HTTP_REQUEST_DATA *pHttpRequestData = NULL;
+      pHttpRequestData = (HTTP_REQUEST_DATA*)malloc(sizeof(HTTP_REQUEST_DATA));
+      httpRequestDataInit(&pHttpRequestData);
+      return pHttpRequestData;
+   }
 };
+
+
 
 TEST(utestHttpParse, readRequestFirstLine)
 {
    int ret = 0;
    char data[1024] = HTTP_REQUEST;
    char line[1024] = {0};
-   ret = httpParseReadLine(buf, line, 1024, 1024);
-   CHECK_EQUAL(0, ret);
-   STRCMP_EQUAL(line, "GET / HTTP1.0\r\n");
+   ret = httpParseReadLine(data, line, 1024, 1024);
+   STRCMP_EQUAL(line, "GET / HTTP1.0");
+}
+
+TEST(utestHttpParse, readRequestData)
+{
+   int ret = 0;
+   char data[1024] = HTTP_REQUEST;
+   HTTP_REQUEST_DATA *pHttpRequestData = NULL;
+
+   pHttpRequestData = constructHttpRequestData();
+
+   int ret = parseHttpRequestData(buf, &pHttpRequestData);
+   CHECK_EQUAL(ret, SUCCESS);
 }
 

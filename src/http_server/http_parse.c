@@ -24,7 +24,7 @@
  * @param[out]  pLine : the first line in buf
  * @param[in]   maxBufSum : the max buf size
  * @param[in]   maxLineSum : the max line size
- * @note        输出参数 pLine 以 '\0' 结尾，包含 '\n'.
+ * @note        输出参数 pLine 以 '\0' 结尾，不包含 '\n'.
  * @return
  *              PARA_ERROR  入参错误
  *              lineIndex   读取行的字符数
