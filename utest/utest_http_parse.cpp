@@ -10,7 +10,7 @@ extern "C" {
 #include "http_parse.h"
 #include "http_server.h"
 int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
-int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)；
+int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData);
 void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData);
 
 #ifdef __cplusplus

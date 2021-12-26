@@ -105,16 +105,21 @@ void splitStr(char *line, char word[][MAX_LINE_LEN], const char delim, int maxOu
     strncpy(word[wordIndex], line, MAX_LINE_LEN);
 }
 
+BOOLEAN isSameStr(const char *src, const char *dist)
+{
+    return isSameStr(src, dist) == 0 ? TRUE : FALSE;
+}
+
 int getMethed(char *method, HTTP_REQUEST_HEADER *pReqHead)
 {
     int ret = SUCCESS;
 
-    if (strcasecmp(method, "GET"))
+    if (isSameStr(method, "GET"))
     {
         pReqHead->method = GET;
         return ret;
     }
-    else if (strcasecmp(method, "POST"))
+    else if (isSameStr(method, "POST"))
     {
         pReqHead->method = POST;
         return ret;
@@ -132,11 +137,11 @@ int getVersion(char *version, HTTP_REQUEST_HEADER *pReqHead)
 {
     int ret = SUCCESS;
 
-    if (strcasecmp(version, "HTTP/1.0"))
+    if (isSameStr(version, "HTTP/1.0"))
     {
         pReqHead->version = HTTP_10;
     }
-    else if (strcasecmp(version, "HTTP/1.1"))
+    else if (isSameStr(version, "HTTP/1.1"))
     {
         pReqHead->version = HTTP_11;
     }
@@ -199,18 +204,18 @@ int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pReqHead)
 
     splitStr(line, kvBuf, ':', 2);
 
-    if (strcasecmp(kvBuf[0], "Host"))
+    if (isSameStr(kvBuf[0], "Host") != 0)
     {
         strncpy(pReqHead->host, kvBuf[1], MAX_VALUE_LEN);
     }
-    else if (strcasecmp(kvBuf[0], "Connection"))
+    else if (isSameStr(kvBuf[0], "Connection") != 0)
     {
-        if (strcasecmp(kvBuf[1], "keep-alive"))
+        if (isSameStr(kvBuf[1], "keep-alive") != 0)
         {
             pReqHead->keep_alive = TRUE;
         }
     }
-    else if (strcasecmp(kvBuf[0], "Cookies"))
+    else if (isSameStr(kvBuf[0], "Cookies"))
     {
         strncpy(pReqHead->cookie, kvBuf[1], MAX_VALUE_LEN);
     }
