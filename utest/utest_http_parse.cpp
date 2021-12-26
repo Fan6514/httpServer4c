@@ -61,7 +61,7 @@ TEST(utestHttpParse, readRequestData)
 
    pHttpRequestData = constructHttpRequestData();
 
-   int ret = parseHttpRequestData(data, &pHttpRequestData);
+   ret = parseHttpRequestData(data, &pHttpRequestData);
    CHECK_EQUAL(ret, SUCCESS);
    CHECK_EQUAL(pHttpRequestData->header->method, GET);
    CHECK_EQUAL(pHttpRequestData->header->version, HTTP_10);
