@@ -23,7 +23,6 @@
 /*--------------------------------------------------*/
 typedef enum { GET = 0, POST, PUT, DELETE, METHOD_NOT_SUPPORT }HTTP_METHOD;
 typedef enum { HTTP_10 = 0, HTTP_11, VERSION_NOT_SUPPORT }HTTP_VERSION;
-typedef enum { KEEP_ALIVE = 0 }HTTP_CONNECTION;
 typedef enum { PARSE_REQUEST_LINE = 0, PARSE_REQUEST_HEAD, 
                 PARSE_REQUEST_BODY, PARSE_COMPLATE, PARSE_UNDEFINED }PARSE_STATE;
 typedef enum { UNCOMPLATE = 0, SEND_RESPONSE }RESPONSE_STATE;

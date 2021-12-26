@@ -114,11 +114,11 @@ void httpServerEntry(void *arg)
         /* 解析请求报文 */
         ret = parseHttpRequestData(buf, &pHttpRequestData);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] parse http request data error.");
-
         if (PARSE_COMPLATE != pHttpRequestData->state.parse_state)
         {
             continue;
         }
+
         /* 处理请求报文 */
         ret = httpServerHandler(pHttpRequestData, pHttpResponseData);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] handle http request data error.");
@@ -133,6 +133,18 @@ finish:
     httpResponseDataUninit(&pHttpResponseData);
 }
 
+/*******************************************************************************
+ * @brief       服务器上电初始化
+ * @param[in]   port : 启动端口
+ * @param[in]   pollSize : 线程池大小
+ * @param[in]   pollCoreSize : 核心线程池大小
+ * @param[out]   ppThread_pool : 线程池
+ * @param[out]   epoll_fd : epoll句柄
+ * @param[out]   server_socket : 服务器socket
+ * @note        
+ * @return
+ *              SUCCESS     上电成功
+********************************************************************************/
 int httpServerStartUp(int port, int pollSize, int pollCoreSize, ThreadPool **ppThread_pool, 
                         int *epoll_fd, SERVER_SOCKET *server_socket)
 {

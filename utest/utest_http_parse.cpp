@@ -18,6 +18,7 @@ void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData);
 #endif
 
 #define HTTP_REQUEST "GET / HTTP1.0\r\n\
+Host:127.0.0.1:8000\r\n\
 Accept:image/gif.image/jpeg.*/*\r\n\
 Accept-Language:zh-cn\r\n\
 Connection:Keep-Alive\r\n\Host:localhost\r\n\
@@ -43,8 +44,6 @@ TEST_GROUP(utestHttpParse)
    }
 };
 
-
-
 TEST(utestHttpParse, readRequestFirstLine)
 {
    int ret = 0;
@@ -62,7 +61,12 @@ TEST(utestHttpParse, readRequestData)
 
    pHttpRequestData = constructHttpRequestData();
 
-   int ret = parseHttpRequestData(buf, &pHttpRequestData);
+   int ret = parseHttpRequestData(data, &pHttpRequestData);
    CHECK_EQUAL(ret, SUCCESS);
+   CHECK_EQUAL(pHttpRequestData->header->method, GET);
+   CHECK_EQUAL(pHttpRequestData->header->version, HTTP_10);
+   STRCMP_EQUAL(pHttpRequestData->header->url, "/");
+   STRCMP_EQUAL(pHttpRequestData->header->host, "127.0.0.1:8000");
+   CHECK_EQUAL(pHttpRequestData->header->keep_alive, TRUE);
 }
 
