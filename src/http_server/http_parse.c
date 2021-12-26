@@ -107,7 +107,7 @@ void splitStr(char *line, char word[][MAX_LINE_LEN], const char delim, int maxOu
 
 BOOLEAN isSameStr(const char *src, const char *dist)
 {
-    return isSameStr(src, dist) == 0 ? TRUE : FALSE;
+    return strcasecmp(src, dist) == 0 ? TRUE : FALSE;
 }
 
 int getMethed(char *method, HTTP_REQUEST_HEADER *pReqHead)
@@ -263,7 +263,7 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
 
     memset(line, 0, MAX_LINE_LEN);
     pReqHead = (*ppHttpRequestData)->header;
-    *state = &(*ppHttpRequestData)->state.parse_state;
+    state = &(*ppHttpRequestData)->state.parse_state;
     pBody = (*ppHttpRequestData)->body;
 
     /* 解析报文内容 */
@@ -283,6 +283,7 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
             case PARSE_REQUEST_LINE:
                 ret = parseHttpRequestMsgLine(line, pReqHead);
                 if (SUCCESS == ret) { *state = PARSE_REQUEST_HEAD; }
+                else { goto finish; }
                 LOG_DEBUG("[httpParse] method:%d url:%s version:%d", 
                             pReqHead->method, pReqHead->url, pReqHead->version);
                 break;

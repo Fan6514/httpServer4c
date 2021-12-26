@@ -17,7 +17,7 @@ void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData);
 }
 #endif
 
-#define HTTP_REQUEST "GET / HTTP1.0\r\n\
+#define HTTP_REQUEST "GET / HTTP/1.0\r\n\
 Host:127.0.0.1:8000\r\n\
 Accept:image/gif.image/jpeg.*/*\r\n\
 Accept-Language:zh-cn\r\n\
@@ -50,7 +50,7 @@ TEST(utestHttpParse, readRequestFirstLine)
    char data[1024] = HTTP_REQUEST;
    char line[1024] = {0};
    ret = httpParseReadLine(data, line, 1024, 1024);
-   STRCMP_EQUAL(line, "GET / HTTP1.0");
+   STRCMP_EQUAL(line, "GET / HTTP/1.0");
 }
 
 TEST(utestHttpParse, readRequestData)
