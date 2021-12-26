@@ -34,6 +34,8 @@ void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData)
     (*ppHttpRequestData)->header = pReqHeader;
     (*ppHttpRequestData)->body = requestBody;
 
+    return;
+
 error:
     REL_MEMORY(requestBody);
     REL_MEMORY(pReqHeader);
@@ -68,6 +70,8 @@ void httpResponseDataInit(HTTP_RESPONSE_DATA **ppHttpResponseData)
     (*ppHttpResponseData)->state.response_state = UNCOMPLATE;
     (*ppHttpResponseData)->header = pRspHeader;
     (*ppHttpResponseData)->body = responseBody;
+
+    return;
 
 error:
     REL_MEMORY(responseBody);

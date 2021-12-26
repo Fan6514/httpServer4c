@@ -23,6 +23,7 @@ do\
     if (NULL != ptr)\
     {\
         free(ptr);\
+        ptr = NULL;\
     }\
 }while(0)
 

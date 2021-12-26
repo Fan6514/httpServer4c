@@ -18,55 +18,50 @@ void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData);
 #endif
 
 #define HTTP_REQUEST "GET / HTTP/1.0\r\n\
-Host:127.0.0.1:8000\r\n\
 Accept:image/gif.image/jpeg.*/*\r\n\
 Accept-Language:zh-cn\r\n\
-Connection:Keep-Alive\r\n\Host:localhost\r\n\
+Connection:Keep-Alive\r\n\
+Host:localhost\r\n\
 User-Agent:Mozila/4.0(compatible:MSIE5.01:Windows NT5.0)\r\n\
 Accept-Encoding:gzip,deflate.\r\n"
 
 TEST_GROUP(utestHttpParse)
 {
-   void setup()
-   {
-   }
+    void setup()
+    {
+    }
 
-   void teardown()
-   {
-   }
-
-   HTTP_REQUEST_DATA *constructHttpRequestData()
-   {
-      HTTP_REQUEST_DATA *pHttpRequestData = NULL;
-      pHttpRequestData = (HTTP_REQUEST_DATA*)malloc(sizeof(HTTP_REQUEST_DATA));
-      httpRequestDataInit(&pHttpRequestData);
-      return pHttpRequestData;
-   }
+    void teardown()
+    {
+    }
 };
 
 TEST(utestHttpParse, readRequestFirstLine)
 {
-   int ret = 0;
-   char data[1024] = HTTP_REQUEST;
-   char line[1024] = {0};
-   ret = httpParseReadLine(data, line, 1024, 1024);
-   STRCMP_EQUAL(line, "GET / HTTP/1.0");
+    int ret = 0;
+    char data[1024] = HTTP_REQUEST;
+    char line[1024] = {0};
+    ret = httpParseReadLine(data, line, 1024, 1024);
+    STRCMP_EQUAL(line, "GET / HTTP/1.0");
 }
 
 TEST(utestHttpParse, readRequestData)
 {
-   int ret = 0;
-   char data[1024] = HTTP_REQUEST;
-   HTTP_REQUEST_DATA *pHttpRequestData = NULL;
+    int ret = 0;
+    char data[1024] = HTTP_REQUEST;
+    HTTP_REQUEST_DATA *pHttpRequestData = NULL;
 
-   pHttpRequestData = constructHttpRequestData();
+    pHttpRequestData = (HTTP_REQUEST_DATA*)malloc(sizeof(HTTP_REQUEST_DATA));
+    httpRequestDataInit(&pHttpRequestData);
 
-   ret = parseHttpRequestData(data, &pHttpRequestData);
-   CHECK_EQUAL(ret, SUCCESS);
-   CHECK_EQUAL(pHttpRequestData->header->method, GET);
-   CHECK_EQUAL(pHttpRequestData->header->version, HTTP_10);
-   STRCMP_EQUAL(pHttpRequestData->header->url, "/");
-   STRCMP_EQUAL(pHttpRequestData->header->host, "127.0.0.1:8000");
-   CHECK_EQUAL(pHttpRequestData->header->keep_alive, TRUE);
+    ret = parseHttpRequestData(data, &pHttpRequestData);
+    CHECK_EQUAL(ret, SUCCESS);
+    CHECK_EQUAL(pHttpRequestData->header->method, GET);
+    CHECK_EQUAL(pHttpRequestData->header->version, HTTP_10);
+    STRCMP_EQUAL(pHttpRequestData->header->url, "/");
+    STRCMP_EQUAL(pHttpRequestData->header->host, "localhost");
+    CHECK_EQUAL(pHttpRequestData->header->keep_alive, TRUE);
+
+    httpRequestDataUninit(&pHttpRequestData);
 }
 
