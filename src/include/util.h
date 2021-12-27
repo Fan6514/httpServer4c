@@ -99,4 +99,8 @@ do\
     }\
 }while(0)
 
+int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
+void splitStr(char *line, char word[][MAX_LINE_LEN], const char delim, int maxOutNum);
+BOOLEAN isSameStr(const char *src, const char *dist);
+
 #endif

@@ -7,8 +7,10 @@
 #include "http_server.h"
 #include "http_parse.h"
 #include "util.h"
+#include "url_reg.h"
 
 extern struct epoll_event *events;
+extern URL_REG_TYPE gRegUrls;
 
 /*******************************************************************************
  * @brief : 初始化请求报文
@@ -86,6 +88,43 @@ void httpResponseDataUninit(HTTP_RESPONSE_DATA **ppHttpResponseData)
 }
 
 /*******************************************************************************
+ * @brief       处理请求的url
+ * @param[in]   pHttpRequestData : 请求报文
+ * @param[out]  pHttpResponseData : 响应报文
+ * @note        
+ * @return
+ *              SUCCESS     处理成功
+********************************************************************************/
+int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_DATA *pHttpResponseData)
+{
+    int ret = 0;
+    int urlId = 0;
+    char url[MAX_URL_LEN] = {0};
+    char arg[MAX_URL_LEN] = {0};
+    HTTP_REQUEST_HEADER *pReqHead = NULL;
+
+    CHECK_POINT(pHttpRequestData);
+    CHECK_POINT(pHttpResponseData);
+
+    pReqHead = pHttpRequestData->header;
+    if(isUrlHandle(pReqHead))
+    {
+        getRequestUrl(pReqHead, url, arg);
+        urlId = findUrlId(url);
+        if (urlId < 0)
+        {/* not found */
+            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
+        }
+        /* 处理对应 url */
+        gRegUrls.urls[urlId].urlProcResponse((void *)arg);
+    }
+    else
+    {
+
+    }
+}
+
+/*******************************************************************************
  * @brief       http 入口函数
  * @param[in]   arg : SERVER_SOCKET 类型，包括服务器和客户端套接字
  * @note        
@@ -124,11 +163,15 @@ void httpServerEntry(void *arg)
         }
 
         /* 处理请求报文 */
-        ret = httpServerHandler(pHttpRequestData, pHttpResponseData);
+        ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] handle http request data error.");
         /* 发送响应 */
-        ret = httpSendResponse(server_socket, pHttpResponseData);
+        ret = httpSendResponseMessage(server_socket, pHttpResponseData);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error.");
+        if (SUCCESS == ret)
+        {
+            pHttpRequestData->state.parse_state = PARSE_REQUEST_LINE;
+        }
     }
 
 finish:
