@@ -187,10 +187,10 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
     while (*buf != '\0')
     {
         readNum = httpParseReadLine(buf, line, MAX_BUf_LEN, MAX_LINE_LEN);
-        LOG_INFO("Read line: %s", line);
+        LOG_INFO("Read line: %s, Line size: %d", line, readNum);
         buf += readNum;
 
-        if (*line == '\n')
+        if (*line == '\n' || *line == '\r')
         {
             *state = PARSE_REQUEST_BODY;
             continue;
@@ -220,9 +220,7 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
         memset(line, 0, MAX_LINE_LEN);
     }
 
-    LOG_INFO("[httpServer] method:%d, version:%d, url:%s", pReqHead->method, 
-                                                            pReqHead->version, 
-                                                            pReqHead->url);
+    LOG_INFO("[httpServer] Request data parse finish.");
 
 finish:
     return ret;

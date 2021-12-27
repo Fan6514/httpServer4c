@@ -20,7 +20,6 @@ URL_REG_TYPE gRegUrls;
 
 void urlRegInit()
 {
-    memset(gRegUrls, 0, sizeof(gRegUrls));
     gRegUrls.regNum = 0;
     for (int i = 0; i < MAX_URL_PROC_NUM; ++i)
     {
@@ -28,8 +27,6 @@ void urlRegInit()
         gRegUrls.urls[i].urlProcResponse = NULL;
         memset(gRegUrls.urls[i].url, 0, MAX_URL_LEN);
     }
-
-    
 
     return;
 }

@@ -190,7 +190,7 @@ int constructResponse(HTTP_RESPONSE_DATA *pHttpResponseData, char *buf, int bufL
 int httpSendResponseMessage(SERVER_SOCKET *server_socket, HTTP_RESPONSE_DATA *pHttpResponseData)
 {
     int ret = 0;
-    char buf = NULL;
+    char *buf = NULL;
 
     CHECK_POINT(server_socket);
     CHECK_POINT(pHttpResponseData);
@@ -198,7 +198,7 @@ int httpSendResponseMessage(SERVER_SOCKET *server_socket, HTTP_RESPONSE_DATA *pH
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
 
     ret = constructResponse(pHttpResponseData, buf, MAX_BUf_LEN);
-    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] constructResponse error, buf:%s.", buf);
+    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] constructResponse error.");
     LOG_DEBUG("Construct response message:\n%s\n", buf);
 
     ret = socketSend(server_socket, buf);
