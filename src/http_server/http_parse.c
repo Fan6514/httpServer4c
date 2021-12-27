@@ -170,6 +170,7 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
     int ret = SUCCESS;
     char line[MAX_LINE_LEN];
     char *pBody = NULL;
+    char *tempBuf = NULL;
     HTTP_REQUEST_HEADER *pReqHead = NULL;
     PARSE_STATE *state = NULL;
 
@@ -182,19 +183,21 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
     pReqHead = (*ppHttpRequestData)->header;
     state = &(*ppHttpRequestData)->state.parse_state;
     pBody = (*ppHttpRequestData)->body;
+    tempBuf = buf;
 
     /* 解析报文内容 */
-    while (*buf != '\0')
+    while (*tempBuf != '\0')
     {
-        readNum = httpParseReadLine(buf, line, MAX_BUf_LEN, MAX_LINE_LEN);
+        readNum = httpParseReadLine(tempBuf, line, MAX_BUf_LEN, MAX_LINE_LEN);
         LOG_INFO("Read line: %s, Line size: %d", line, readNum);
-        buf += readNum;
+        tempBuf += readNum;
 
         if (*line == '\n' || *line == '\r')
         {
             *state = PARSE_REQUEST_BODY;
             continue;
         }
+
         switch (*state)
         {
             case PARSE_REQUEST_LINE:

@@ -30,6 +30,7 @@
 int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
 {
     int lineIndex = 0;
+    int readLength = 0;
 
     CHECK_POINT(buf);
     CHECK_POINT(pLine);
@@ -38,25 +39,52 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
         return PARA_ERROR;
     }
 
-    /* 跳过字符串开头的空行和'\n' */
-    while(*buf == ' ' || *buf == '\n')
+    /* 换行符直接返回 */
+    if (*buf == '\r' && *(buf+1) == '\n')
+    {
+        pLine[lineIndex] = '\r';
+        pLine[lineIndex+1] = '\n';
+        readLength += 2;
+        return readLength;
+    }
+    if (*buf == '\n')
+    {
+        pLine[lineIndex] = '\n';
+        readLength++;
+        return readLength;
+    }
+
+    /* 跳过字符串开头的空字符 */
+    while(*buf == ' ')
     {
         buf++;
+        readLength++;
     }
 
     while (*buf != '\0' && lineIndex < maxLineSum -1)
     {
         /* 忽略 \r */
-        if (*buf == '\r') { buf += 2; break; }
-        if (*buf == '\n') { buf++; break; }
+        if (*buf == '\r') 
+        { 
+            buf += 2;
+            readLength += 2;
+            break;
+        }
+        if (*buf == '\n') 
+        {
+            buf++;
+            readLength++;
+            break;
+        }
         pLine[lineIndex] = *buf;
         buf++;
+        readLength++;
         lineIndex++;
     }
     pLine[lineIndex] = '\0';
     lineIndex++;
 
-    return lineIndex;
+    return readLength;
 }
 
 /*******************************************************************************

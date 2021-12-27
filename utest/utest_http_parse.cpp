@@ -23,7 +23,7 @@ Accept-Language:zh-cn\r\n\
 Connection:Keep-Alive\r\n\
 Host:localhost\r\n\
 User-Agent:Mozila/4.0(compatible:MSIE5.01:Windows NT5.0)\r\n\
-Accept-Encoding:gzip,deflate.\r\n"
+Accept-Encoding:gzip,deflate.\r\n\r\n"
 
 TEST_GROUP(utestHttpParse)
 {
