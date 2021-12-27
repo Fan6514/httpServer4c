@@ -22,7 +22,7 @@
  * @param[out]  pLine : the first line in buf
  * @param[in]   maxBufSum : the max buf size
  * @param[in]   maxLineSum : the max line size
- * @note        输出参数 pLine 以 '\0' 结尾，忽略 '\r' 且不包含 '\n'.
+ * @note        输出参数 pLine 以 '\0' 结尾，忽略 '\n' 或 '\r\n'.
  * @return
  *              PARA_ERROR  入参错误
  *              lineIndex   读取行的字符数
@@ -44,12 +44,13 @@ int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum)
         buf++;
     }
 
-    while (*buf != '\0' && *buf != '\n' && lineIndex < maxLineSum -1)
+    while (*buf != '\0' && lineIndex < maxLineSum -1)
     {
+        /* 忽略 \r */
+        if (*buf == '\r') { buf += 2; break; }
+        if (*buf == '\n') { buf++; break; }
         pLine[lineIndex] = *buf;
         buf++;
-        /* 忽略 \r */
-        if (*buf == '\r') { buf++; }
         lineIndex++;
     }
     pLine[lineIndex] = '\0';
