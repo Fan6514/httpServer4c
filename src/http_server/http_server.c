@@ -154,7 +154,7 @@ int constructResponse(HTTP_RESPONSE_DATA *pHttpResponseData, char *buf, int bufL
     HTTP_RESPONSE_HEADER *pResHead = NULL;
 
     memset(tempBuf, 0, bufLen);
-    pResHead = parseHttpRequestMsgHead->header;
+    pResHead = pHttpResponseData->header;
     tempBuf = buf;
 
     if (HTTP_10 == pResHead->version)
