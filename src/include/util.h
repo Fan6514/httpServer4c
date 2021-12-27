@@ -7,7 +7,9 @@
 /* 宏定义
 */
 /*--------------------------------------------------*/
-/* Define a Boolean data type. (from linux kernel 2.6.0) */
+#define MAX_LINE_LEN    1024
+
+/* Define a Boolean data type. */
 typedef enum { FALSE, TRUE } __attribute__ ((packed)) BOOLEAN;
 
 #define SUCCESS         0
