@@ -71,6 +71,7 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pReqHead)
 {
     int readNum = 0;
     int ret = SUCCESS;
+    char *urlTemp = NULL;
     char word[3][MAX_LINE_LEN];
 
     CHECK_POINT(line);
@@ -83,7 +84,18 @@ int parseHttpRequestMsgLine(char *line, HTTP_REQUEST_HEADER *pReqHead)
     ret = getMethed(word[0], pReqHead);
 
     /* request url */
-    strncpy(pReqHead->url, word[1], MAX_LINE_LEN);
+    urlTemp = word[1];
+    while (*urlTemp != '?' && *urlTemp != '\0')
+    {
+        urlTemp++;
+    }
+    if (*urlTemp == '?')
+    {
+        *urlTemp = '\0';
+        urlTemp++;
+        strncpy(pReqHead->var, urlTemp, MAX_URL_LEN);
+    }
+    strncpy(pReqHead->url, word[1], MAX_URL_LEN);
 
     /* request http version */
     ret = getVersion(word[2], pReqHead);

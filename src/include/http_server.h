@@ -9,6 +9,7 @@
 /* 宏定义
 */
 /*--------------------------------------------------*/
+#define RETURN_CODE_LEN     4
 #define MAX_IPADDR_LEN      16
 #define MAX_KEY_LEN         24
 #define MAX_COOKIES_LEN     128
@@ -26,12 +27,6 @@ typedef enum { HTTP_10 = 0, HTTP_11, VERSION_NOT_SUPPORT }HTTP_VERSION;
 typedef enum { PARSE_REQUEST_LINE = 0, PARSE_REQUEST_HEAD, 
                 PARSE_REQUEST_BODY, PARSE_COMPLATE, PARSE_UNDEFINED }PARSE_STATE;
 typedef enum { UNCOMPLATE = 0, SEND_RESPONSE }RESPONSE_STATE;
-typedef enum
-{
-    RETURN_STATE_OK = 200,
-    RETURN_STATE_NOT_FUND = 404,
-    RETURN_STATE_NOT_IMPLEMENTED = 501
-} RETURN_STATE_CODE;
 
 /* http处理状态 */
 typedef struct http_state
@@ -46,6 +41,7 @@ typedef struct http_request_header
     HTTP_METHOD method;             /** @brief 请求方法 */
     HTTP_VERSION version;           /** @brief http 协议版本 */
     char url[MAX_URL_LEN];          /** @brief url */
+    char var[MAX_URL_LEN];          /** @brief GET 请求的变量 */
     char host[MAX_VALUE_LEN];       /** @brief 主机地址 */
     BOOLEAN keep_alive;             /** @brief 连接状态 */
     char cookie[MAX_COOKIES_LEN];   /** @brief Cookie */
@@ -64,7 +60,7 @@ typedef struct http_request_data
 typedef struct http_response_header
 {
     HTTP_VERSION version;           /** @brief http 协议版本 */
-    RETURN_STATE_CODE rtncode;      /** @brief http 返回状态码 */
+    char rtncode[RETURN_CODE_LEN];  /** @brief http 返回状态码 */
     char reason[MAX_KEY_LEN];       /** @brief http 原因短语 */
     char contentType[MAX_KEY_LEN];  /** @brief http 返回内容类型 */
 }HTTP_RESPONSE_HEADER;

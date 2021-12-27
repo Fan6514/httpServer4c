@@ -107,7 +107,7 @@ void httpUrlNotFound(void *arg)
     memset(resBuf, 0, RESPONSE_BUFFER_SUM);
 
     /* 处理报文头 */
-    pRspHead->rtncode = RETURN_STATE_NOT_FUND;
+    strncpy(pRspHead->rtncode, "404", RETURN_CODE_LEN);
     strncpy(pRspHead->reason, "NOT FOUND", sizeof(pRspHead->reason));
     strncpy(pRspHead->contentType, "text/html", sizeof(pRspHead->contentType));
 

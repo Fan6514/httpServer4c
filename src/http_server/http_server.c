@@ -66,7 +66,6 @@ void httpResponseDataInit(HTTP_RESPONSE_DATA **ppHttpResponseData)
     GET_MEMORY(pRspHeader, HTTP_RESPONSE_HEADER, sizeof(HTTP_RESPONSE_HEADER), error);
 
     /* 初始化请求报文头 */
-    pRspHeader->rtncode = RETURN_STATE_NOT_FUND;
     pRspHeader->version = VERSION_NOT_SUPPORT;
 
     (*ppHttpResponseData)->state.response_state = UNCOMPLATE;
@@ -85,6 +84,19 @@ void httpResponseDataUninit(HTTP_RESPONSE_DATA **ppHttpResponseData)
     REL_MEMORY((*ppHttpResponseData)->header);
     REL_MEMORY((*ppHttpResponseData)->body);
     REL_MEMORY(*ppHttpResponseData);
+}
+
+/*******************************************************************************
+ * @brief       是否需要由url处理
+ * @param[in]   pReqHead : 请求报文头
+ * @note        当GET请求有变量，或POST请求，则由cgi处理
+ * @return
+ *              TRUE / FALSE
+********************************************************************************/
+BOOLEAN isUrlHandle(HTTP_REQUEST_HEADER* pReqHead)
+{
+    if (pReqHead == NULL) { return FALSE; }
+    return ((POST == pReqHead->method) || (GET == pReqHead->method && pReqHead->var[0] != '\0'));
 }
 
 /*******************************************************************************
@@ -107,9 +119,9 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
     CHECK_POINT(pHttpResponseData);
 
     pReqHead = pHttpRequestData->header;
+    pHttpResponseData->header->version = pReqHead->version;
     if(isUrlHandle(pReqHead))
     {
-        getRequestUrl(pReqHead, url, arg);
         urlId = findUrlId(url);
         if (urlId < 0)
         {/* not found */
@@ -122,6 +134,78 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
     {
 
     }
+
+    return ret;
+}
+
+/*******************************************************************************
+ * @brief       构造http响应报文字符串
+ * @param[in]   pHttpResponseData : 响应报文
+ * @param[in]   buf : 缓冲区
+ * @note        
+ * @return
+ *              SUCCESS     处理成功
+********************************************************************************/
+int constructResponse(HTTP_RESPONSE_DATA *pHttpResponseData, char *buf, int bufLen)
+{
+    int ret = 0;
+    int index = 0;
+    char *tempBuf = NULL;
+    HTTP_RESPONSE_HEADER *pResHead = NULL;
+
+    memset(tempBuf, 0, bufLen);
+    pResHead = parseHttpRequestMsgHead->header;
+    tempBuf = buf;
+
+    if (HTTP_10 == pResHead->version)
+    {
+        strncpy(tempBuf, "HTTP/1.0 ", bufLen);
+    }
+    else
+    {
+        strncpy(tempBuf, "HTTP/1.1 ", bufLen);
+    }
+
+    strncat(tempBuf, pResHead->rtncode, bufLen);
+    strncat(tempBuf, " ", bufLen);
+    strncat(tempBuf, pResHead->reason, bufLen);
+    strncat(tempBuf, "\r\n", bufLen);
+    strncat(tempBuf, "Content-Type: ", bufLen);
+    strncat(tempBuf, pResHead->contentType, bufLen);
+    strncat(tempBuf, "\r\n", bufLen);
+    strncat(tempBuf, "\r\n", bufLen);
+    strncat(tempBuf, pHttpResponseData->body, bufLen);
+    
+    return ret;
+}
+
+/*******************************************************************************
+ * @brief       发送http响应报文
+ * @param[in]   server_socket : 服务器socket
+ * @param[in]   pHttpResponseData : 响应报文
+ * @note        
+ * @return
+ *              SUCCESS     处理成功
+********************************************************************************/
+int httpSendResponseMessage(SERVER_SOCKET *server_socket, HTTP_RESPONSE_DATA *pHttpResponseData)
+{
+    int ret = 0;
+    char buf = NULL;
+
+    CHECK_POINT(server_socket);
+    CHECK_POINT(pHttpResponseData);
+
+    GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
+
+    ret = constructResponse(pHttpResponseData, buf, MAX_BUf_LEN);
+    CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] constructResponse error, buf:%s.", buf);
+    LOG_DEBUG("Construct response message:\n%s\n", buf);
+
+    ret = socketSend(server_socket, buf);
+
+finish:
+    REL_MEMORY(buf);
+    return ret;
 }
 
 /*******************************************************************************
