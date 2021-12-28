@@ -98,12 +98,14 @@ int findUrlId(const char *url)
 void httpUrlNotFound(void *arg)
 {
     HTTP_RESPONSE_HEADER *pRspHead = NULL;
+    HTTP_RESPONSE_DATA **ppHttpResponseData = NULL;
     HTTP_RESPONSE_DATA *pHttpResponseData = NULL;
     char resBuf[RESPONSE_BUFFER_SUM];
 
     CHECK_POINT_NORTN(arg);
 
-    pHttpResponseData = (HTTP_RESPONSE_DATA*)arg;
+    ppHttpResponseData = (HTTP_RESPONSE_DATA*)arg;
+    pHttpResponseData = *ppHttpResponseData;
     pRspHead = pHttpResponseData->header;
     memset(resBuf, 0, RESPONSE_BUFFER_SUM);
 

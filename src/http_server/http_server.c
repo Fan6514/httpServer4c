@@ -107,32 +107,37 @@ BOOLEAN isUrlHandle(HTTP_REQUEST_HEADER* pReqHead)
  * @return
  *              SUCCESS     处理成功
 ********************************************************************************/
-int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_DATA *pHttpResponseData)
+int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_DATA **ppHttpResponseData)
 {
     int ret = 0;
     int urlId = 0;
     char url[MAX_URL_LEN] = {0};
     char arg[MAX_URL_LEN] = {0};
-    HTTP_REQUEST_HEADER *pReqHead = NULL;
+    HTTP_REQUEST_HEADER *pRequestHead = NULL;
+    HTTP_RESPONSE_HEADER *pResponseHead = NULL
 
     CHECK_POINT(pHttpRequestData);
     CHECK_POINT(pHttpResponseData);
 
-    pReqHead = pHttpRequestData->header;
-    pHttpResponseData->header->version = pReqHead->version;
+    pResponseHead = (*ppHttpResponseData)->header;
+    pRequestHead = pHttpRequestData->header;
+    pResponseHead->version = pRequestHead->version;
+
+    LOG_DEBUG("httpServerRequestHandler start.");
+
     if(isUrlHandle(pReqHead))
     {
         urlId = findUrlId(url);
         if (urlId < 0)
         {/* not found */
-            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
+            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)ppHttpResponseData);
         }
         /* 处理对应 url */
         gRegUrls.urls[urlId].urlProcResponse((void *)arg);
     }
     else
     {
-        gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
+        gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)ppHttpResponseData);
     }
 
     LOG_DEBUG("httpServerRequestHandler finish.");
@@ -248,7 +253,7 @@ void httpServerEntry(void *arg)
         }
 
         /* 处理请求报文 */
-        ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
+        ret = httpServerRequestHandler(pHttpRequestData, &pHttpResponseData);
         CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] handle http request data error, retCode=%d.", ret);
         /* 发送响应 */
         ret = httpSendResponseMessage(server_socket, pHttpResponseData);
