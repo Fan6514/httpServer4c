@@ -42,7 +42,7 @@ TEST(utestHttpParse, readRequestFirstLine)
     char data[1024] = HTTP_REQUEST;
     char line[1024] = {0};
     ret = httpParseReadLine(data, line, 1024, 1024);
-    STRCMP_EQUAL(line, "GET / HTTP/1.0");
+    STRCMP_EQUAL(line, "GET /notfound HTTP/1.0");
 }
 
 TEST(utestHttpParse, readRequestData)
@@ -58,7 +58,7 @@ TEST(utestHttpParse, readRequestData)
     CHECK_EQUAL(ret, SUCCESS);
     CHECK_EQUAL(pHttpRequestData->header->method, GET);
     CHECK_EQUAL(pHttpRequestData->header->version, HTTP_10);
-    STRCMP_EQUAL(pHttpRequestData->header->url, "/");
+    STRCMP_EQUAL(pHttpRequestData->header->url, "/notfound");
     STRCMP_EQUAL(pHttpRequestData->header->host, "localhost");
     CHECK_EQUAL(pHttpRequestData->header->keep_alive, TRUE);
 
