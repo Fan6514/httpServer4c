@@ -17,7 +17,7 @@ void httpRequestDataInit(HTTP_REQUEST_DATA **ppHttpRequestData);
 }
 #endif
 
-#define HTTP_REQUEST "GET / HTTP/1.0\r\n\
+#define HTTP_REQUEST "GET /notfound HTTP/1.0\r\n\
 Accept:image/gif.image/jpeg.*/*\r\n\
 Accept-Language:zh-cn\r\n\
 Connection:Keep-Alive\r\n\
@@ -65,3 +65,33 @@ TEST(utestHttpParse, readRequestData)
     httpRequestDataUninit(&pHttpRequestData);
 }
 
+TEST_GROUP(utestHttpResponse)
+{
+    void setup()
+    {
+    }
+
+    void teardown()
+    {
+    }
+};
+
+TEST(utestHttpResponse, httpRequestNotFound)
+{
+    int ret = 0;
+    char data[1024] = HTTP_REQUEST;
+    HTTP_REQUEST_DATA *pHttpRequestData = NULL;
+    HTTP_RESPONSE_DATA *pHttpResponseData = NULL;
+
+    pHttpRequestData = (HTTP_REQUEST_DATA*)malloc(sizeof(HTTP_REQUEST_DATA));
+    pHttpResponseData = (HTTP_RESPONSE_DATA*)malloc(sizeof(HTTP_RESPONSE_DATA));
+    httpRequestDataInit(&pHttpRequestData);
+    httpResponseDataInit(&pHttpResponseData);
+
+    ret = parseHttpRequestData(data, &pHttpRequestData);
+    CHECK_EQUAL(ret, SUCCESS);
+
+    ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
+    CHECK_EQUAL(ret, SUCCESS);
+    STRCMP_EQUAL(pHttpResponseData->header->rtncode, "404");
+}

@@ -148,19 +148,20 @@ int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pReqHead)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpRequestBody(char *line, char *pBody)
+int parseHttpRequestBody(char *buf, char *pBody)
 {
-    CHECK_POINT(line);
+    CHECK_POINT(buf);
     CHECK_POINT(pBody);
 
-    strncat(pBody, line, MAX_HTTP_BODY_LEN);
+    strncat(pBody, buf, MAX_HTTP_BODY_LEN);
+    return SUCCESS;
 }
 
 /*******************************************************************************
  * @brief       解析获取的 http 报文内容，包括请求报文头和请求体
  * @param[in]   buf : buffer
  * @param[out]  http_data : http data struct
- * @note        
+ * @note
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
@@ -209,11 +210,11 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pReqHead);
-                LOG_INFO("[httpServer] host:%s keep-alive:%d\n", 
+                LOG_INFO("[httpServer] host:%s keep-alive:%d\n",
                         pReqHead->host, pReqHead->keep_alive);
                 break;
             case PARSE_REQUEST_BODY:
-                ret = parseHttpRequestBody(line, pBody);
+                ret = parseHttpRequestBody(tempBuf, pBody);
                 *state = PARSE_COMPLATE;
                 LOG_INFO("[httpServer] body:%s\n", pBody);
                 break;

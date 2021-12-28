@@ -231,7 +231,7 @@ void httpServerEntry(void *arg)
     /* 初始化请求报文 */
     httpRequestDataInit(&pHttpRequestData);
     /* 初始化响应报文 */
-    httpResponseDataInit(&pHttpResponseData);    
+    httpResponseDataInit(&pHttpResponseData);
 
     while(TRUE)
     {
