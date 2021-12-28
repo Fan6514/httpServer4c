@@ -28,6 +28,10 @@ void urlRegInit()
         memset(gRegUrls.urls[i].url, 0, MAX_URL_LEN);
     }
 
+    gRegUrls.regNum++;
+    gRegUrls.urls[URL_PROC_NOT_FOUND].urlID = URL_PROC_NOT_FOUND;
+    gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse = (void*)httpUrlNotFound;
+
     return;
 }
 

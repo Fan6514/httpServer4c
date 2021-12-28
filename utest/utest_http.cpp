@@ -7,6 +7,7 @@ extern "C" {
 #endif
 
 #include "util.h"
+#include "url_reg.h"
 #include "http_parse.h"
 #include "http_server.h"
 int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
@@ -87,6 +88,7 @@ TEST(utestHttpResponse, httpRequestNotFound)
     pHttpResponseData = (HTTP_RESPONSE_DATA*)malloc(sizeof(HTTP_RESPONSE_DATA));
     httpRequestDataInit(&pHttpRequestData);
     httpResponseDataInit(&pHttpResponseData);
+    urlRegInit();
 
     ret = parseHttpRequestData(data, &pHttpRequestData);
     CHECK_EQUAL(ret, SUCCESS);
