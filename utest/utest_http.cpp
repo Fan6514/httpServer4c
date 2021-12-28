@@ -96,4 +96,7 @@ TEST(utestHttpResponse, httpRequestNotFound)
     ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
     CHECK_EQUAL(ret, SUCCESS);
     STRCMP_EQUAL(pHttpResponseData->header->rtncode, "404");
+
+    httpRequestDataUninit(&pHttpRequestData);
+    httpResponseDataUninit(&pHttpResponseData);
 }

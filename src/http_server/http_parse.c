@@ -205,13 +205,9 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
                 ret = parseHttpRequestMsgLine(line, pReqHead);
                 if (SUCCESS == ret) { *state = PARSE_REQUEST_HEAD; }
                 else { goto finish; }
-                LOG_DEBUG("[httpParse] method:%d url:%s version:%d", 
-                            pReqHead->method, pReqHead->url, pReqHead->version);
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pReqHead);
-                LOG_INFO("[httpServer] host:%s keep-alive:%d\n",
-                        pReqHead->host, pReqHead->keep_alive);
                 break;
             case PARSE_REQUEST_BODY:
                 ret = parseHttpRequestBody(tempBuf, pBody);
@@ -224,7 +220,11 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
         memset(line, 0, MAX_LINE_LEN);
     }
 
-    LOG_INFO("[httpServer] Request data parse finish.");
+    if (GET == pReqHead->method)
+    {
+        *state = PARSE_COMPLATE;
+    }
+    LOG_INFO("[httpServer] Request data parse finish, state:%d.", *state);
 
 finish:
     return ret;

@@ -53,32 +53,32 @@ do\
     memset(ptr, 0, size);\
 }while(0)
 
-#define CHECK_RETURN(ret, sucess, str)\
+#define CHECK_RETURN(ret, sucess, ...)\
 do\
 {\
     if (sucess != ret)\
     {\
-        LOG_ERROR(str);\
+        LOG_ERROR(__VA_ARGS__);\
         ret = RTN_ERROR;\
     }\
 }while(0)
 
-#define CHECK_RETURN_ERR(ret, error, str)\
+#define CHECK_RETURN_ERR(ret, error, ...)\
 do\
 {\
     if (error == ret)\
     {\
-        LOG_ERROR(str);\
+        LOG_ERROR(__VA_ARGS__);\
         ret = RTN_ERROR;\
     }\
 }while(0)
 
-#define CHECK_RETURN_GOTO(ret, sucess, pos, str)\
+#define CHECK_RETURN_GOTO(ret, sucess, pos, ...)\
 do\
 {\
     if (sucess != ret)\
     {\
-        LOG_ERROR(str);\
+        LOG_ERROR(__VA_ARGS__);\
         goto pos;\
     }\
 }while(0)

@@ -135,6 +135,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
         gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
     }
 
+    LOG_DEBUG("httpServerRequestHandler finish.");
     return ret;
 }
 
@@ -248,10 +249,11 @@ void httpServerEntry(void *arg)
 
         /* 处理请求报文 */
         ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
-        CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] handle http request data error.");
+        CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] handle http request data error, retCode=%d.", ret);
         /* 发送响应 */
         ret = httpSendResponseMessage(server_socket, pHttpResponseData);
-        CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error.");
+        CHECK_RETURN_GOTO(ret, SUCCESS, finish, "[httpServer] socket parse http data error, retCode=%d.", ret);
+        
         if (SUCCESS == ret)
         {
             pHttpRequestData->state.parse_state = PARSE_REQUEST_LINE;
