@@ -164,3 +164,27 @@ TEST(utestHttpResponse, httpRequestNotMethod)
     httpRequestDataUninit(&pHttpRequestData);
     httpResponseDataUninit(&pHttpResponseData);
 }
+
+TEST(utestHttpResponse, httpRequestPostNotFound)
+{
+    int ret = 0;
+    char data[1024] = HTTP_POST_REQUEST;
+    HTTP_REQUEST_DATA *pHttpRequestData = NULL;
+    HTTP_RESPONSE_DATA *pHttpResponseData = NULL;
+
+    pHttpRequestData = (HTTP_REQUEST_DATA*)malloc(sizeof(HTTP_REQUEST_DATA));
+    pHttpResponseData = (HTTP_RESPONSE_DATA*)malloc(sizeof(HTTP_RESPONSE_DATA));
+    httpRequestDataInit(&pHttpRequestData);
+    httpResponseDataInit(&pHttpResponseData);
+    urlRegInit();
+
+    ret = parseHttpRequestData(data, &pHttpRequestData);
+    CHECK_EQUAL(ret, SUCCESS);
+
+    ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
+    CHECK_EQUAL(ret, SUCCESS);
+    STRCMP_EQUAL(pHttpResponseData->header->rtncode, "501");
+
+    httpRequestDataUninit(&pHttpRequestData);
+    httpResponseDataUninit(&pHttpResponseData);
+}
