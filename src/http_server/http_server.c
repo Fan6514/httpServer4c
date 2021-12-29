@@ -114,7 +114,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
     char url[MAX_URL_LEN] = {0};
     char arg[MAX_URL_LEN] = {0};
     HTTP_REQUEST_HEADER *pRequestHead = NULL;
-    HTTP_RESPONSE_HEADER *pResponseHead = NULL
+    HTTP_RESPONSE_HEADER *pResponseHead = NULL;
 
     CHECK_POINT(pHttpRequestData);
     CHECK_POINT(pHttpResponseData);
