@@ -82,7 +82,7 @@ void httpResponseDataInit(HTTP_RESPONSE_DATA **ppHttpResponseData);
 void httpResponseDataUninit(HTTP_RESPONSE_DATA **ppHttpResponseData);
 
 BOOLEAN isUrlHandle(HTTP_REQUEST_HEADER* pReqHead);
-int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_DATA *ppHttpResponseData);
+int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_DATA *pHttpResponseData);
 
 int constructResponse(HTTP_RESPONSE_DATA *pHttpResponseData, char *buf, int bufLen);
 int httpSendResponseMessage(SERVER_SOCKET *server_socket, HTTP_RESPONSE_DATA *pHttpResponseData);
