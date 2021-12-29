@@ -148,12 +148,18 @@ int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pReqHead)
  * @return
  *              SUCCESS     解析成功
 ********************************************************************************/
-int parseHttpRequestBody(char *buf, char *pBody)
+int parseHttpRequestBody(char *buf, char *pBody, int bufLen)
 {
     CHECK_POINT(buf);
     CHECK_POINT(pBody);
 
-    strncat(pBody, buf, MAX_HTTP_BODY_LEN);
+    if (bufLen > MAX_HTTP_BODY_LEN)
+    {
+        LOG_ERROR("[http_parse] Body in request message is too large:%d", bufLen);
+        return PARA_ERROR;
+    }
+    memset(pBody, 0, MAX_HTTP_BODY_LEN);
+    strncpy(pBody, buf, bufLen);
     return SUCCESS;
 }
 
@@ -196,7 +202,6 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
         if (*line == '\n' || *line == '\r')
         {
             *state = PARSE_REQUEST_BODY;
-            continue;
         }
 
         switch (*state)
@@ -209,7 +214,7 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
                 ret = parseHttpRequestMsgHead(line, pReqHead);
                 break;
             case PARSE_REQUEST_BODY:
-                ret = parseHttpRequestBody(tempBuf, pBody);
+                ret = parseHttpRequestBody(tempBuf, pBody, pReqHead->contentLen);
                 *state = PARSE_COMPLATE;
                 LOG_INFO("[httpServer] body:%s\n", pBody);
                 break;
