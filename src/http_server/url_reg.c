@@ -32,6 +32,10 @@ void urlRegInit()
     gRegUrls.urls[URL_PROC_NOT_FOUND].urlID = URL_PROC_NOT_FOUND;
     gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse = (void*)httpUrlNotFound;
 
+    gRegUrls.regNum++;
+    gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlID = URL_PROC_NOT_UNIMPLEMENT;
+    gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlProcResponse = (void*)httpUrlUnimplement;
+
     return;
 }
 
@@ -98,14 +102,12 @@ int findUrlId(const char *url)
 void httpUrlNotFound(void *arg)
 {
     HTTP_RESPONSE_HEADER *pRspHead = NULL;
-    HTTP_RESPONSE_DATA **ppHttpResponseData = NULL;
     HTTP_RESPONSE_DATA *pHttpResponseData = NULL;
     char resBuf[RESPONSE_BUFFER_SUM];
 
     CHECK_POINT_NORTN(arg);
 
-    ppHttpResponseData = (HTTP_RESPONSE_DATA*)arg;
-    pHttpResponseData = *ppHttpResponseData;
+    pHttpResponseData = (HTTP_RESPONSE_DATA*)arg;
     pRspHead = pHttpResponseData->header;
     memset(resBuf, 0, RESPONSE_BUFFER_SUM);
 
@@ -121,4 +123,29 @@ void httpUrlNotFound(void *arg)
     strncat(resBuf, "is unavailable or nonexistent.\r\n", RESPONSE_BUFFER_SUM);
     strncat(resBuf, "</BODY></HTML>\r\n", RESPONSE_BUFFER_SUM);
     strncpy(pHttpResponseData->body, resBuf, MAX_HTTP_BODY_LEN);
+}
+
+void httpUrlUnimplement(void *arg)
+{
+    HTTP_RESPONSE_HEADER *pRspHead = NULL;
+    HTTP_RESPONSE_DATA *pHttpResponseData = NULL;
+    char resBuf[RESPONSE_BUFFER_SUM];
+
+    CHECK_POINT_NORTN(arg);
+
+    pHttpResponseData = (HTTP_RESPONSE_DATA*)arg;
+    pRspHead = pHttpResponseData->header;
+    memset(resBuf, 0, RESPONSE_BUFFER_SUM);
+
+    /* 处理报文头 */
+    strncpy(pRspHead->rtncode, "501", RETURN_CODE_LEN);
+    strncpy(pRspHead->reason, "Method Not Implemented", sizeof(pRspHead->reason));
+    strncpy(pRspHead->contentType, "text/html", sizeof(pRspHead->contentType));
+
+    /* 处理报文体 */
+    strncpy(resBuf, "<HTML><HEAD><TITLE>Method Not Implemented\r\n", RESPONSE_BUFFER_SUM);
+    strncat(resBuf, "</TITLE></HEAD>\r\n", RESPONSE_BUFFER_SUM);
+    strncat(resBuf, "<BODY><P>HTTP request method not supported.\r\n", RESPONSE_BUFFER_SUM);
+    strncat(resBuf, "</BODY></HTML>\r\n", RESPONSE_BUFFER_SUM);
+    strncpy(pHttpResponseData->body, resBuf, MAX_HTTP_BODY_LEN); 
 }

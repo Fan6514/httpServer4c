@@ -13,6 +13,7 @@
 typedef enum { FALSE, TRUE } __attribute__ ((packed)) BOOLEAN;
 
 #define SUCCESS         0
+#define NOT_FINISH      1
 #define PARA_ERROR      -1
 #define RTN_ERROR       -2
 #define MEM_ERROR       -3

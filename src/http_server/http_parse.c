@@ -204,7 +204,6 @@ int parseHttpRequestData(char *buf, HTTP_REQUEST_DATA **ppHttpRequestData)
             case PARSE_REQUEST_LINE:
                 ret = parseHttpRequestMsgLine(line, pReqHead);
                 if (SUCCESS == ret) { *state = PARSE_REQUEST_HEAD; }
-                else { goto finish; }
                 break;
             case PARSE_REQUEST_HEAD:
                 ret = parseHttpRequestMsgHead(line, pReqHead);

@@ -107,7 +107,7 @@ BOOLEAN isUrlHandle(HTTP_REQUEST_HEADER* pReqHead)
  * @return
  *              SUCCESS     处理成功
 ********************************************************************************/
-int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_DATA **ppHttpResponseData)
+int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_DATA *pHttpResponseData)
 {
     int ret = 0;
     int urlId = 0;
@@ -119,25 +119,31 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
     CHECK_POINT(pHttpRequestData);
     CHECK_POINT(pHttpResponseData);
 
-    pResponseHead = (*ppHttpResponseData)->header;
+    pResponseHead = pHttpResponseData->header;
     pRequestHead = pHttpRequestData->header;
     pResponseHead->version = pRequestHead->version;
 
     LOG_DEBUG("httpServerRequestHandler start.");
 
-    if(isUrlHandle(pReqHead))
+    if (METHOD_NOT_SUPPORT == pRequestHead->method)
+    {/* 501请求不存在 */
+        gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlProcResponse((void *)pHttpResponseData);
+        return ret;
+    }
+
+    if(isUrlHandle(pRequestHead))
     {
         urlId = findUrlId(url);
         if (urlId < 0)
         {/* not found */
-            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)ppHttpResponseData);
+            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
         }
         /* 处理对应 url */
         gRegUrls.urls[urlId].urlProcResponse((void *)arg);
     }
     else
     {
-        gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)ppHttpResponseData);
+        gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
     }
 
     LOG_DEBUG("httpServerRequestHandler finish.");
@@ -155,11 +161,9 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
 int constructResponse(HTTP_RESPONSE_DATA *pHttpResponseData, char *buf, int bufLen)
 {
     int ret = 0;
-    int index = 0;
     char *tempBuf = NULL;
     HTTP_RESPONSE_HEADER *pResHead = NULL;
 
-    memset(tempBuf, 0, bufLen);
     pResHead = pHttpResponseData->header;
     tempBuf = buf;
 
@@ -233,6 +237,7 @@ void httpServerEntry(void *arg)
     server_socket = (SERVER_SOCKET *)arg;
     GET_MEMORY(buf, char, MAX_BUf_LEN, finish);
     GET_MEMORY(pHttpRequestData, HTTP_REQUEST_DATA, sizeof(HTTP_REQUEST_DATA), finish);
+    GET_MEMORY(pHttpResponseData, HTTP_RESPONSE_DATA, sizeof(HTTP_RESPONSE_DATA), finish);
 
     /* 初始化请求报文 */
     httpRequestDataInit(&pHttpRequestData);
@@ -262,6 +267,7 @@ void httpServerEntry(void *arg)
         if (SUCCESS == ret)
         {
             pHttpRequestData->state.parse_state = PARSE_REQUEST_LINE;
+            break;
         }
     }
 
