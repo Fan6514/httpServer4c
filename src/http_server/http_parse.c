@@ -13,6 +13,7 @@
  * <h2><center>&copy;COPYRIGHT 2021 WELLCASA All Rights Reserved.</center></h2>
 ********************************************************************************/
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "http_parse.h"
@@ -135,6 +136,10 @@ int parseHttpRequestMsgHead(char *line, HTTP_REQUEST_HEADER *pReqHead)
     else if (isSameStr(kvBuf[0], "Cookies"))
     {
         strncpy(pReqHead->cookie, kvBuf[1], MAX_VALUE_LEN);
+    }
+    else if (isSameStr(kvBuf[0], "Content-Length"))
+    {
+        pReqHead->contentLen = atoi(kvBuf[1]);
     }
 
     return ret;
