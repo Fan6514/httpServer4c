@@ -20,6 +20,8 @@ URL_REG_TYPE gRegUrls;
 
 void urlRegInit()
 {
+    URL_PROC_TYPE urlProcPattern;
+
     gRegUrls.regNum = URL_PROC_BEGIN;
     for (int i = 0; i < MAX_URL_PROC_NUM; ++i)
     {
@@ -33,6 +35,11 @@ void urlRegInit()
 
     gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlID = URL_PROC_NOT_UNIMPLEMENT;
     gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlProcResponse = (void*)httpUrlUnimplement;
+
+    urlProcPattern.urlID = URL_PROC_TEST;
+    strncpy(urlProcPattern.url, "/test", MAX_URL_LEN);
+    urlProcPattern.urlProcResponse = (void*)httpUrlTest;
+    ret = urlRegInsert(&urlProcPattern);
 
     return;
 }
@@ -52,7 +59,7 @@ int urlRegInsert(URL_PROC_TYPE *urlProc)
     }
 
     gRegUrls.urls[gRegUrls.regNum].urlID = urlProc->urlID;
-    gRegUrls.urls[gRegUrls.regNum].urlProcResponse = urlProc->urlProcResponse;
+    gRegUrls.urls[gRegUrls.regNum].urlProcResponse = (void*)urlProc->urlProcResponse;
     strncpy(gRegUrls.urls[gRegUrls.regNum].url, urlProc->url, MAX_URL_LEN);
     gRegUrls.regNum++;
 

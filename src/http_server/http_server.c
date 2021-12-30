@@ -145,6 +145,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
     else if (GET == pRequestHead->method)
     {
         urlId = findUrlId(pRequestHead->url);
+        LOG_INFO("urlId=%d, ", gRegUrls.urls[urlId].urlID);
         if (urlId < 0)
         {/* not found */
             LOG_DEBUG("Request url is not found! urlID=%d", urlId);
