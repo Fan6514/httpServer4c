@@ -143,9 +143,17 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
         /* 处理对应 url */
         gRegUrls.urls[urlId].urlProcResponse((void *)arg);
     }
-    else
+    else if (GET == pRequestHead->method)
     {
-        gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
+        urlId = findUrlId(url);
+        if (urlId < 0)
+        {/* not found */
+            LOG_DEBUG("Request url is not found! urlID=%d", urlId);
+            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
+            return ret;
+        }
+        /* 处理对应 url */
+        gRegUrls.urls[urlId].urlProcResponse((void *)arg);
     }
 
     LOG_DEBUG("httpServerRequestHandler finish.");
