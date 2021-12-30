@@ -111,7 +111,6 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
 {
     int ret = 0;
     int urlId = 0;
-    char url[MAX_URL_LEN] = {0};
     char arg[MAX_URL_LEN] = {0};
     HTTP_REQUEST_HEADER *pRequestHead = NULL;
     HTTP_RESPONSE_HEADER *pResponseHead = NULL;
@@ -133,7 +132,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
 
     if(isUrlHandle(pRequestHead))
     {
-        urlId = findUrlId(url);
+        urlId = findUrlId(pRequestHead->url);
         if (urlId < 0)
         {/* not found */
             LOG_DEBUG("Request url is not found! urlID=%d", urlId);
@@ -145,7 +144,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
     }
     else if (GET == pRequestHead->method)
     {
-        urlId = findUrlId(url);
+        urlId = findUrlId(pRequestHead->url);
         if (urlId < 0)
         {/* not found */
             LOG_DEBUG("Request url is not found! urlID=%d", urlId);
