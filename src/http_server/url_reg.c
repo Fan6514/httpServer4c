@@ -36,10 +36,8 @@ void urlRegInit()
     gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlID = URL_PROC_NOT_UNIMPLEMENT;
     gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlProcResponse = (void*)httpUrlUnimplement;
 
-    urlProcPattern.urlID = URL_PROC_TEST;
-    strncpy(urlProcPattern.url, "/test", MAX_URL_LEN);
-    urlProcPattern.urlProcResponse = (void*)httpUrlTest;
-    ret = urlRegInsert(&urlProcPattern);
+    gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlID = URL_PROC_TEST;
+    gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlProcResponse = (void*)httpUrlTest;
 
     return;
 }
