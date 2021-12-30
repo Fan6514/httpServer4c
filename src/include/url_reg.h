@@ -99,6 +99,6 @@ void httpUrlUnimplement(void *arg);
  * @note        
  * @return      void
 ********************************************************************************/
-void httpUrlTest(void *arg)
+void httpUrlTest(void *arg);
 
 #endif

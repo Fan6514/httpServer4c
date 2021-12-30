@@ -55,7 +55,7 @@ int urlRegInsert(URL_PROC_TYPE *urlProc)
     gRegUrls.urls[gRegUrls.regNum].urlProcResponse = urlProc->urlProcResponse;
     strncpy(gRegUrls.urls[gRegUrls.regNum].url, urlProc->url, MAX_URL_LEN);
     gRegUrls.regNum++;
-    
+
     return ret;
 }
 
@@ -75,6 +75,7 @@ int urlRegDelete(int urlID)
             gRegUrls.urls[i].urlID = -1;
             gRegUrls.urls[i].urlProcResponse = NULL;
             memset(gRegUrls.urls[i].url, 0, MAX_URL_LEN);
+            gRegUrls.regNum--;
             break;
         }
     }
