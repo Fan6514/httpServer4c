@@ -17,6 +17,7 @@
 
 /* web处理url函数 */
 #define URL_PROC_BEGIN              10
+#define URL_PROC_TEST               URL_PROC_BEGIN
 
 /*--------------------------------------------------*/
 /* 数据结构 
@@ -91,5 +92,13 @@ void httpUrlNotFound(void *arg);
  * @return      void
 ********************************************************************************/
 void httpUrlUnimplement(void *arg);
+
+/*******************************************************************************
+ * @brief       测试服务器连接
+ * @param[in]   arg : 回调入参，HTTP_RESPONSE_DATA类型
+ * @note        
+ * @return      void
+********************************************************************************/
+void httpUrlTest(void *arg)
 
 #endif

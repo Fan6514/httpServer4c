@@ -270,7 +270,6 @@ void httpServerEntry(void *arg)
             pHttpRequestData->state.parse_state = PARSE_REQUEST_LINE;
             break;
         }
-        break;
     }
 
 finish:
