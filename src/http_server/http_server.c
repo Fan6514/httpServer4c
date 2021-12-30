@@ -136,6 +136,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
         urlId = findUrlId(url);
         if (urlId < 0)
         {/* not found */
+            LOG_DEBUG("Request url is not found! urlID=%d", urlId);
             gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
             return ret;
         }
