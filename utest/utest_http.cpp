@@ -45,6 +45,14 @@ Host:localhost\r\n\
 User-Agent:Mozila/4.0(compatible:MSIE5.01:Windows NT5.0)\r\n\
 Accept-Encoding:gzip,deflate.\r\n\r\n"
 
+#define HTTP_TEST_PAGE "GET /test HTTP/1.0\r\n\
+Accept:image/gif.image/jpeg.*/*\r\n\
+Accept-Language:zh-cn\r\n\
+Connection:Keep-Alive\r\n\
+Host:localhost\r\n\
+User-Agent:Mozila/4.0(compatible:MSIE5.01:Windows NT5.0)\r\n\
+Accept-Encoding:gzip,deflate.\r\n\r\n"
+
 TEST_GROUP(utestHttpParse)
 {
     void setup()
@@ -184,6 +192,30 @@ TEST(utestHttpResponse, httpRequestPostNotFound)
     ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
     CHECK_EQUAL(ret, SUCCESS);
     STRCMP_EQUAL(pHttpResponseData->header->rtncode, "404");
+
+    httpRequestDataUninit(&pHttpRequestData);
+    httpResponseDataUninit(&pHttpResponseData);
+}
+
+TEST(utestHttpResponse, httpRequestGetTestPage)
+{
+    int ret = 0;
+    char data[1024] = HTTP_TEST_PAGE;
+    HTTP_REQUEST_DATA *pHttpRequestData = NULL;
+    HTTP_RESPONSE_DATA *pHttpResponseData = NULL;
+
+    pHttpRequestData = (HTTP_REQUEST_DATA*)malloc(sizeof(HTTP_REQUEST_DATA));
+    pHttpResponseData = (HTTP_RESPONSE_DATA*)malloc(sizeof(HTTP_RESPONSE_DATA));
+    httpRequestDataInit(&pHttpRequestData);
+    httpResponseDataInit(&pHttpResponseData);
+    urlRegInit();
+
+    ret = parseHttpRequestData(data, &pHttpRequestData);
+    CHECK_EQUAL(ret, SUCCESS);
+
+    ret = httpServerRequestHandler(pHttpRequestData, pHttpResponseData);
+    CHECK_EQUAL(ret, SUCCESS);
+    STRCMP_EQUAL(pHttpResponseData->header->rtncode, "200");
 
     httpRequestDataUninit(&pHttpRequestData);
     httpResponseDataUninit(&pHttpResponseData);
