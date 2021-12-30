@@ -140,7 +140,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
             return ret;
         }
         /* 处理对应 url */
-        gRegUrls.urls[urlId].urlProcResponse((void *)arg);
+        gRegUrls.urls[urlId].urlProcResponse((void *)pHttpResponseData);
     }
     else if (GET == pRequestHead->method)
     {
@@ -153,7 +153,7 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
             return ret;
         }
         /* 处理对应 url */
-        gRegUrls.urls[urlId].urlProcResponse((void *)arg);
+        gRegUrls.urls[urlId].urlProcResponse((void *)pHttpResponseData);
     }
 
     LOG_DEBUG("httpServerRequestHandler finish.");
