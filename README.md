@@ -7,7 +7,7 @@ HTTP 协议的底层使用 TCP 协议，HTTP/1.0 版本默认使用短链接，�
 
 整个系统的框架如下：
 
-![httpstruct](pics\httpmodel.png)
+![httpstruct](/pics/httpmodel.png)
 
 服务器收到浏览器发送的 HTTP 请求后建立 TCP 连接，由线程池分配线程进行相应的请求处理。
 
