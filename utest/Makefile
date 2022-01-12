@@ -6,6 +6,7 @@
 # Inputs - these variables describe what to build
 COMPONENT_NAME = UTEST_HTTP_SERVER
 CPPUTEST_HOME = /usr
+PROJECT_DIR = {cd ../ && pwd}
 
 CPP_PLATFORM = Gcc
 
@@ -13,16 +14,16 @@ CPP_PLATFORM = Gcc
 # when using std library includes like <list> and other containers
 # so that memory leak detection does not conflict with stl.
 SRC_DIRS = \
-        /root/httpServer4c/src\
-        /root/httpServer4c/src/http_server\
-        /root/httpServer4c/src/log\
-        /root/httpServer4c/src/thread_pool
+        ${PROJECT_DIR}/src\
+        ${PROJECT_DIR}/src/http_server\
+        ${PROJECT_DIR}/src/log\
+        ${PROJECT_DIR}/src/thread_pool
 
 TEST_SRC_DIRS = \
-        /root/httpServer4c/utest
+        ${PROJECT_DIR}/utest
 
 INCLUDE_DIRS =\
-        /root/httpServer4c/src/include\
+        ${PROJECT_DIR}/src/include\
         /usr/log4c/include
 
 CPPUTEST_LIB_DIR = /usr/log4c/lib

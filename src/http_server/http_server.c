@@ -130,31 +130,16 @@ int httpServerRequestHandler(HTTP_REQUEST_DATA *pHttpRequestData, HTTP_RESPONSE_
         return ret;
     }
 
-    if(isUrlHandle(pRequestHead))
-    {
-        urlId = findUrlId(pRequestHead->url);
-        if (urlId < 0)
-        {/* not found */
-            LOG_DEBUG("Request url is not found! urlID=%d", urlId);
-            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
-            return ret;
-        }
-        /* 处理对应 url */
-        gRegUrls.urls[urlId].urlProcResponse((void *)pHttpResponseData);
+    urlId = findUrlId(pRequestHead->url);
+    LOG_INFO("urlId=%d, ", gRegUrls.urls[urlId].urlID);
+    if (urlId < 0)
+    {/* not found */
+        LOG_DEBUG("Request url is not found! urlID=%d", urlId);
+        gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
+        return ret;
     }
-    else if (GET == pRequestHead->method)
-    {
-        urlId = findUrlId(pRequestHead->url);
-        LOG_INFO("urlId=%d, ", gRegUrls.urls[urlId].urlID);
-        if (urlId < 0)
-        {/* not found */
-            LOG_DEBUG("Request url is not found! urlID=%d", urlId);
-            gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse((void *)pHttpResponseData);
-            return ret;
-        }
-        /* 处理对应 url */
-        gRegUrls.urls[urlId].urlProcResponse((void *)pHttpResponseData);
-    }
+    /* 处理对应 url */
+    gRegUrls.urls[urlId].urlProcResponse((void *)pHttpResponseData);
 
     LOG_DEBUG("httpServerRequestHandler finish.");
     return ret;
@@ -283,6 +268,7 @@ void httpServerEntry(void *arg)
 
 finish:
     REL_MEMORY(buf);
+    close(server_socket->conn_fd);
     httpRequestDataUninit(&pHttpRequestData);
     httpResponseDataUninit(&pHttpResponseData);
 }

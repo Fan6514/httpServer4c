@@ -11,11 +11,11 @@
 #define MAX_URL_PROC_NUM            1024
 #define RESPONSE_BUFFER_SUM         1024
 
-/* 系统默认的处理函数 */
+/* 系统默认的视图处理函数 */
 #define URL_PROC_NOT_FOUND          0
 #define URL_PROC_NOT_UNIMPLEMENT    1
 
-/* web处理url函数 */
+/* 注册视图函数的 URLID */
 #define URL_PROC_BEGIN              10
 #define URL_PROC_TEST               URL_PROC_BEGIN
 
@@ -35,7 +35,7 @@ typedef struct url_proc_type
 typedef struct url_reg_type
 {
     int regNum;                             /** @brief 注册个数 */
-    URL_PROC_TYPE urls[MAX_URL_PROC_NUM];
+    URL_PROC_TYPE views[MAX_URL_PROC_NUM];
 }URL_REG_TYPE;
 
 
@@ -57,7 +57,7 @@ void urlRegInit();
  * @return      SUCCESS : 注册成功
  *              RTN_ERROR ： 注册失败
 ********************************************************************************/
-int urlRegInsert(URL_PROC_TYPE *urlProc);
+int urlRegInsert(const char *url, int urlId, (void**)httpViewFunc);
 
 /*******************************************************************************
  * @brief       删除 url

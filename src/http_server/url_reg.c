@@ -25,41 +25,45 @@ void urlRegInit()
     gRegUrls.regNum = URL_PROC_BEGIN;
     for (int i = 0; i < MAX_URL_PROC_NUM; ++i)
     {
-        gRegUrls.urls[i].urlID = -1;
-        gRegUrls.urls[i].urlProcResponse = NULL;
-        memset(gRegUrls.urls[i].url, 0, MAX_URL_LEN);
+        gRegUrls.views[i].urlID = -1;
+        gRegUrls.views[i].urlProcResponse = NULL;
+        memset(gRegUrls.views[i].url, 0, MAX_URL_LEN);
     }
 
-    gRegUrls.urls[URL_PROC_NOT_FOUND].urlID = URL_PROC_NOT_FOUND;
-    gRegUrls.urls[URL_PROC_NOT_FOUND].urlProcResponse = (void*)httpUrlNotFound;
+    gRegUrls.views[URL_PROC_NOT_FOUND].urlID = URL_PROC_NOT_FOUND;
+    gRegUrls.views[URL_PROC_NOT_FOUND].urlProcResponse = (void*)httpUrlNotFound;
 
-    gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlID = URL_PROC_NOT_UNIMPLEMENT;
-    gRegUrls.urls[URL_PROC_NOT_UNIMPLEMENT].urlProcResponse = (void*)httpUrlUnimplement;
+    gRegUrls.views[URL_PROC_NOT_UNIMPLEMENT].urlID = URL_PROC_NOT_UNIMPLEMENT;
+    gRegUrls.views[URL_PROC_NOT_UNIMPLEMENT].urlProcResponse = (void*)httpUrlUnimplement;
 
-    gRegUrls.urls[URL_PROC_TEST].urlID = URL_PROC_TEST;
-    gRegUrls.urls[URL_PROC_TEST].urlProcResponse = (void*)httpUrlTest;
-    strncpy(gRegUrls.urls[URL_PROC_TEST].url, "/test", MAX_URL_LEN);
+    gRegUrls.views[URL_PROC_TEST].urlID = URL_PROC_TEST;
+    gRegUrls.views[URL_PROC_TEST].urlProcResponse = (void*)httpUrlTest;
+    strncpy(gRegUrls.views[URL_PROC_TEST].url, "/test", MAX_URL_LEN);
+
+    urlRegInsert("/test", URL_PROC_TEST, &httpUrlTest);
 
     return;
 }
 
-int urlRegInsert(URL_PROC_TYPE *urlProc)
+int urlRegInsert(const char *url, int urlId, (void**)httpViewFunc)
 {
-    int urlId = 0;
     int ret = SUCCESS;
+    URL_PROC_TYPE *view;
 
-    CHECK_POINT(urlProc);
-
-    urlId = urlProc->urlID;
+    CHECK_POINT(httpViewFunc);
+    CHECK_POINT(*httpViewFunc);
     if (urlId < URL_PROC_BEGIN || urlId >= MAX_URL_PROC_NUM)
     {
         LOG_ERROR("[url_reg] insert url proccess irlID:%d error", urlId);
         return RTN_ERROR;
     }
 
-    gRegUrls.urls[gRegUrls.regNum].urlID = urlProc->urlID;
-    gRegUrls.urls[gRegUrls.regNum].urlProcResponse = (void*)urlProc->urlProcResponse;
-    strncpy(gRegUrls.urls[gRegUrls.regNum].url, urlProc->url, MAX_URL_LEN);
+    view = &gRegUrls.views[gRegUrls.regNum];
+
+    view->urlID = urlId;
+    view->urlProcResponse = *httpViewFunc;
+    strncpy(view->url, url, MAX_URL_LEN);
+
     gRegUrls.regNum++;
 
     return ret;
@@ -76,11 +80,11 @@ int urlRegDelete(int urlID)
 
     for (int i = URL_PROC_BEGIN; i < MAX_URL_PROC_NUM; ++i)
     {
-        if (gRegUrls.urls[i].urlID == urlID)
+        if (gRegUrls.views[i].urlID == urlID)
         {
-            gRegUrls.urls[i].urlID = -1;
-            gRegUrls.urls[i].urlProcResponse = NULL;
-            memset(gRegUrls.urls[i].url, 0, MAX_URL_LEN);
+            gRegUrls.views[i].urlID = -1;
+            gRegUrls.views[i].urlProcResponse = NULL;
+            memset(gRegUrls.views[i].url, 0, MAX_URL_LEN);
             gRegUrls.regNum--;
             break;
         }
@@ -95,9 +99,9 @@ int findUrlId(const char *url)
 
     for (int i = URL_PROC_BEGIN; i < MAX_URL_PROC_NUM; ++i)
     {
-        if (isSameStr(gRegUrls.urls[i].url, url))
+        if (isSameStr(gRegUrls.views[i].url, url))
         {
-            urlId = gRegUrls.urls[i].urlID;
+            urlId = gRegUrls.views[i].urlID;
             return urlId;
         }
     }

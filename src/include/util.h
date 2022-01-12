@@ -1,5 +1,5 @@
-#ifndef _COMMON_H_
-#define _COMMON_H_
+#ifndef _UTIL_H_
+#define _UTIL_H_
 
 #include <stdlib.h>
 #include "logger.h"
