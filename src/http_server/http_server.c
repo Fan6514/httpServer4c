@@ -304,22 +304,22 @@ int httpEventListen(SERVER_SOCKET *server_socket, int port)
  * @return
  *              SUCCESS     上电成功
 ********************************************************************************/
-int httpServerStartUp(int port, int pollSize, int pollCoreSize, ThreadPool **ppThread_pool, 
-                        int *epoll_fd, SERVER_SOCKET *server_socket)
+int httpServerStartUp(CONFIG_INFO *pConfigInfo, ThreadPool **ppThread_pool, int *epoll_fd, SERVER_SOCKET *server_socket)
 {
     int ret = SUCCESS;
 
+    CHECK_POINT(pConfigInfo);
     CHECK_POINT(ppThread_pool);
     CHECK_POINT(epoll_fd);
     CHECK_POINT(server_socket);
 
     /* 初始化线程池 */
-    *ppThread_pool = threadPoolCreate(MAX_CONNECTION, pollSize, pollCoreSize);
+    *ppThread_pool = threadPoolCreate(MAX_CONNECTION, pConfigInfo->poolSize, pConfigInfo->poolCoreSize);
     CHECK_POINT(*ppThread_pool);
-    LOG_INFO("[threadPool create] poolSize: %d, poolCoreSize:%d", pollSize, pollCoreSize);
+    LOG_INFO("[threadPool create] poolSize: %d, poolCoreSize:%d", pConfigInfo->poolSize, pConfigInfo->poolCoreSize);
 
     /* 监听套接字 */
-    ret = httpEventListen(server_socket, port);
+    ret = httpEventListen(server_socket, pConfigInfo->port);
     CHECK_RETURN_ERR(ret, -1, "httpEventListen error.");
 
     /* 初始化 epoll */
@@ -341,7 +341,7 @@ int httpServerStartUp(int port, int pollSize, int pollCoreSize, ThreadPool **ppT
  * @return
  *              SUCCESS     下电成功
 ********************************************************************************/
-int httpServerRun(int port, int pollSize, int pollCoreSize)
+int httpServerRun(CONFIG_INFO *pConfigInfo)
 {
     int ret = SUCCESS;
     int epoll_fd = 0;
@@ -349,8 +349,10 @@ int httpServerRun(int port, int pollSize, int pollCoreSize)
     SERVER_SOCKET server_socket;
     ThreadPool *thread_pool = NULL;
 
+    CHECK_POINT(pConfigInfo);
+
     /* 服务器初始化 */
-    ret = httpServerStartUp(port, pollSize, pollCoreSize, &thread_pool, &epoll_fd, &server_socket);
+    ret = httpServerStartUp(pConfigInfo, &thread_pool, &epoll_fd, &server_socket);
     CHECK_RETURN_GOTO(ret, SUCCESS, finish, "httpServerStartUp error.");
 
     while(TRUE)

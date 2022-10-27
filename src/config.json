@@ -1,0 +1,15 @@
+{
+    "server": {
+        "port": 2000,
+        "thread_pool_size": 100,
+        "thread_pool_core_size": 20
+    },
+    "sql": {
+        "pool_size": 10,
+        "user": "root",
+        "password": "root"
+    },
+    "log": {
+        "category_name": "httpserver"
+    }
+}

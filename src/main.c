@@ -28,11 +28,22 @@ void parseSqlConfig(cJSON *sqlJson, CONFIG_INFO *pConfigInfo)
     CHECK_POINT_NORTN(serverJson);
     CHECK_POINT_NORTN(pConfigInfo);
 
-    pConfigInfo->sqlPoolSize = cJSON_GetObjectItem(sqlJson,"port")->valueint;
+    pConfigInfo->sqlPoolSize = cJSON_GetObjectItem(sqlJson,"pool_size")->valueint;
     pValue = cJSON_GetObjectItem(sqlJson,"user")->valuestring;
     strncpy(pConfigInfo->sqlUser, pValue, sizeof(pConfigInfo->sqlUser));
     pValue = cJSON_GetObjectItem(sqlJson,"password")->valuestring;
     strncpy(pConfigInfo->sqlPasswd, pValue, sizeof(pConfigInfo->sqlPasswd));
+}
+
+void parseLogConfig(cJSON *logJson, CONFIG_INFO *pConfigInfo)
+{
+    char *pValue = NULL;
+
+    CHECK_POINT_NORTN(serverJson);
+    CHECK_POINT_NORTN(pConfigInfo);
+
+    pValue = cJSON_GetObjectItem(serverJson,"category_name")->valuestring;
+    strncpy(pConfigInfo->logCategoryName, pValue, sizeof(pConfigInfo->logCategoryName));
 }
 
 void parseJson(CONFIG_INFO *pConfigInfo, char *pBuf, int bufLen)
@@ -51,6 +62,8 @@ void parseJson(CONFIG_INFO *pConfigInfo, char *pBuf, int bufLen)
     parseServerConfig(serverJson, pConfigInfo);
     sqlJson = cJSON_GetObjectItem(mainJson, "sql");
     parseSqlConfig(sqlJson, pConfigInfo);
+    logJson = cJSON_GetObjectItem(mainJson, "log");
+    parseLogConfig(logJson, pConfigInfo);
 }
 
 void configSet(CONFIG_INFO *pConfigInfo)
@@ -65,9 +78,9 @@ void configSet(CONFIG_INFO *pConfigInfo)
     getcwd(fileName, MAX_FILE_NAME_LEN);
     strncat(fileName, "config.json", MAX_FILE_NAME_LEN);
     fp = fopen(fileName, "r");
-    CHECK_EXPRESSION_NORTN(NULL == fp, "Not found config file \"./config.json\".");
+    CHECK_EXPRESSION_NORTN(NULL == fp, "Not found config file %s.\n", fileName);
 
-    /* »ñÈ¡ÅäÖÃÄÚÈİ */
+    /* è·å–é…ç½®å†…å®¹ */
     fseek(fp, 0, SEEK_END);
     fileLen = ftell(fp);
     fseek(fp, 0, SEEK_SET);
@@ -84,12 +97,19 @@ void configInitDefault(CONFIG_INFO *pConfigInfo)
     pConfigInfo->port = 8000;
     pConfigInfo->poolSize = 100;
     pConfigInfo->poolCoreSize = 10;
+
+    strncpy(pConfigInfo->logCategoryName, "httpserver", sizeof(pConfigInfo->logCategoryName));
+}
+
+void showHelp()
+{
+    printf(SHOW_HELP);
 }
 
 int argParse(int argc, char *argv[], CONFIG_INFO *pConfigInfo)
 {
     int opt = 0;
-    const char *optStr = "hp:"
+    const char *optStr = "chp:"
 
     CHECK_POINT(pConfigInfo);
 
@@ -119,16 +139,16 @@ int main(int argc, char *argv[])
 {
     CONFIG_INFO tConfigInfo = {0};
 
-    /* ÃüÁîĞĞ½âÎö */
+    /* å‘½ä»¤è¡Œè§£æ */
     argParse(argc, argv, &tConfigInfo);
 
-    /* ³õÊ¼»¯ÈÕÖ¾ */
-    loggerInit("httpserver");
-    /* ×¢²áurl */
+    /* åˆå§‹åŒ–æ—¥å¿— */
+    loggerInit(tConfigInfo.logCategoryName);
+    /* æ³¨å†Œurl */
     urlRegInit();
-    /* Á¬½Ósql */
+    /* è¿æ¥sql */
     sqlConnect();
-    /* ·şÎñÆ÷ÔËĞĞ */
+    /* æœåŠ¡å™¨è¿è¡Œ */
     httpServerRun(&tConfigInfo);
 
     loggerUninit();

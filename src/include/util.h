@@ -7,6 +7,8 @@
 /* 宏定义
 */
 /*--------------------------------------------------*/
+#define SHOW_HELP ""
+
 #define MAX_LINE_LEN    1024
 #define MAX_USER_NAME_LEN   32
 #define MAX_USER_PASSWD_LEN 32
@@ -128,13 +130,15 @@ do\
 
 typedef struct config_info
 {
-    int port;                               /** @brief 端口 */
-    int poolSize;                           /** @brief 线程池大小 */
-    int poolCoreSize;                       /** @brief 核心线程池大小 */
+    int port;                                   /** @brief 端口 */
+    int poolSize;                               /** @brief 线程池大小 */
+    int poolCoreSize;                           /** @brief 核心线程池大小 */
 
-    int sqlPoolSize;                        /** @brief 数据库连接池数量 */
-    char sqlUser[MAX_USER_NAME_LEN];        /** @brief 数据库用户名 */
-    char sqlPasswd[MAX_USER_PASSWD_LEN];    /** @brief 数据库用户密码 */
+    int sqlPoolSize;                            /** @brief 数据库连接池数量 */
+    char sqlUser[MAX_USER_NAME_LEN];            /** @brief 数据库用户名 */
+    char sqlPasswd[MAX_USER_PASSWD_LEN];        /** @brief 数据库用户密码 */
+
+    char logCategoryName[MAX_FILE_NAME_LEN];    /** @brief 日志项目名称 */
 }CONFIG_INFO;
 
 int httpParseReadLine(char *buf, char *pLine, int maxBufSum, int maxLineSum);
