@@ -273,6 +273,25 @@ finish:
     httpResponseDataUninit(&pHttpResponseData);
 }
 
+int httpEventListen(SERVER_SOCKET *server_socket, int port)
+{
+    int ret = 0;
+
+    CHECK_POINT(server_socket);
+
+    /* 初始化 socket */
+    ret = socketInit(server_socket, port);
+    CHECK_RETURN_ERR(ret, -1, "socketInit error.");
+    /* bind */
+    ret = socketBind(server_socket);
+    CHECK_RETURN_ERR(ret, -1, "socketBind error.");
+    /* listen */
+    ret = socketListen(server_socket);
+    CHECK_RETURN_ERR(ret, -1, "socketListen error.");
+
+    return ret;
+}
+
 /*******************************************************************************
  * @brief       服务器上电初始化
  * @param[in]   port : 启动端口
@@ -299,19 +318,14 @@ int httpServerStartUp(int port, int pollSize, int pollCoreSize, ThreadPool **ppT
     CHECK_POINT(*ppThread_pool);
     LOG_INFO("[threadPool create] poolSize: %d, poolCoreSize:%d", pollSize, pollCoreSize);
 
-    /* 初始化 socket */
-    ret = socketInit(server_socket, port);
-    CHECK_RETURN_ERR(ret, -1, "socketInit error.");
-    /* bind */
-    ret = socketBind(server_socket);
-    CHECK_RETURN_ERR(ret, -1, "socketBind error.");
-    /* listen */
-    ret = socketListen(server_socket);
-    CHECK_RETURN_ERR(ret, -1, "socketListen error.");
+    /* 监听套接字 */
+    ret = httpEventListen(server_socket, port);
+    CHECK_RETURN_ERR(ret, -1, "httpEventListen error.");
 
     /* 初始化 epoll */
     *epoll_fd = epollInit();
     CHECK_RETURN_ERR(*epoll_fd, -1, "epollInit error.");
+    /* 向epoll注册监听事件 */
     ret = epollEventAdd(*epoll_fd, server_socket->listen_fd);
     CHECK_RETURN_ERR(ret, -1, "epollEventAdd error.");
 
@@ -352,12 +366,12 @@ int httpServerRun(int port, int pollSize, int pollCoreSize)
         for (int i = 0; i < eventSum; ++i)
         {
             ret = socketAccept(&server_socket);
-            CHECK_RETURN(ret, SUCCESS, "socketAccept error.");
+            CHECK_RETURN_GOTO(ret, SUCCESS, "socketAccept error.");
             LOG_INFO("[socket]connect:%d port:%u client addr:%s", server_socket.conn_fd, server_socket.port,
                                                     inet_ntoa(server_socket.clientAddr.sin_addr));
 
             ret = threadPoolAddTask(thread_pool, httpServerEntry, (void*)&server_socket);
-            CHECK_RETURN(ret, SUCCESS, "threadPoolAddTask error.");
+            CHECK_RETURN_GOTO(ret, SUCCESS, "threadPoolAddTask error.");
         }
     }
 
